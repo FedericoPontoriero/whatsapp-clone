@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function App() {
     const clickHandler = () => {
@@ -9,9 +9,11 @@ export default function App() {
 
     return (
         <SafeAreaProvider style={styles.container}>
-            <Text>Open up App.tsx to start working on your app!</Text>
-            <StatusBar style="auto" />
-            <Button title="Click" onPress={clickHandler} />
+            <SafeAreaView>
+                <Text>Open up App.tsx to start working on your app!</Text>
+                <StatusBar style="auto" />
+                <Button title="Click" onPress={clickHandler} />
+            </SafeAreaView>
         </SafeAreaProvider>
     );
 }
