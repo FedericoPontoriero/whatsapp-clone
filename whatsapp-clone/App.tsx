@@ -3,8 +3,14 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import * as Font from "expo-font";
+import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import ChatListScreen from "./screens/ChatListScreen"
+import ChatSettingsScreen from "./screens/ChatSettingsScreen";
 
 SplashScreen.preventAutoHideAsync();
+const Stack = createStackNavigator()
 
 export default function App() {
     const [appIsLoaded, setAppIsLoaded] = useState(false);
@@ -13,7 +19,7 @@ export default function App() {
         const prepare = async () => {
             try {
                 await Font.loadAsync({
-                    black: require("./assets/fonts//Roboto-Black.ttf"),
+                    black: require("./assets/fonts/Roboto-Black.ttf"),
                     blackItalic: require("./assets/fonts/Roboto-BlackItalic.ttf"),
                     bold: require("./assets/fonts/Roboto-Bold.ttf"),
                     boldItalic: require("./assets/fonts/Roboto-BoldItalic.ttf"),
@@ -46,9 +52,15 @@ export default function App() {
 
     return (
         <SafeAreaProvider onLayout={onLayout} style={styles.container}>
-            <SafeAreaView>
-                <Text>Hi</Text>
-            </SafeAreaView>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Home" component={ChatListScreen} />
+                    <Stack.Screen name="ChatSettings" component={ChatSettingsScreen} options={{
+                        headerTitle: 'Settings',
+                        headerBackTitle: 'Back',
+                    }} />
+                </Stack.Navigator>
+            </NavigationContainer>
         </SafeAreaProvider>
     );
 }
@@ -57,8 +69,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
     },
     label: {
         color: "black",
