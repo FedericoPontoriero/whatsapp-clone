@@ -1,18 +1,29 @@
-import { StatusBar } from "expo-status-bar";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import * as SplashScreen from "expo-splash-screen";
+import { useCallback, useEffect, useState } from "react";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-    const clickHandler = () => {
-        console.log("pressed");
-    };
+    const [appIsLoaded, setAppIsLoaded] = useState(false);
+
+    useEffect(() => {
+        setAppIsLoaded(true);
+    }, []);
+
+    const onLayout = useCallback(async () => {
+        if (appIsLoaded) {
+            await SplashScreen.hideAsync();
+        }
+    }, [appIsLoaded]);
+
+    if (!appIsLoaded) return null;
 
     return (
-        <SafeAreaProvider style={styles.container}>
+        <SafeAreaProvider onLayout={onLayout} style={styles.container}>
             <SafeAreaView>
-                <Text>Open up App.tsx to start working on your app!</Text>
-                <StatusBar style="auto" />
-                <Button title="Click" onPress={clickHandler} />
+                <Text>Hi</Text>
             </SafeAreaView>
         </SafeAreaProvider>
     );
