@@ -9,7 +9,7 @@ interface InputProps extends ViewProps {
     iconSize?: number;
     errorText?: string;
     id?: string;
-    onInputChanged?: (inputId: number, inputValue: string) => void
+    onInputChanged?: (inputId: string, inputValue: string) => void
 }
 
 const Input = (props: InputProps) => {
