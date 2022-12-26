@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TextInput, View, ViewProps } from "react-native"
+import { StyleSheet, Text, TextInput, TextInputProps, View, ViewProps } from "react-native"
 
 import colors from "../constants/colors"
 
-interface InputProps extends ViewProps {
+interface InputProps extends TextInputProps {
     label: string;
     icon?: string;
     iconPack: any;
@@ -25,7 +25,7 @@ const Input = (props: InputProps) => {
             {props.icon &&
                 <props.iconPack name={props.icon} size={props.iconSize || 15} style={styles.icon} />
             }
-            <TextInput style={styles.input} onChangeText={onChangeText} />
+            <TextInput {...props} style={styles.input} onChangeText={onChangeText} />
         </View>
         {props.errorText &&
             <View style={styles.errorContainer}>
