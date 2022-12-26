@@ -8,16 +8,24 @@ interface InputProps extends ViewProps {
     iconPack: any;
     iconSize?: number;
     errorText?: string;
+    id?: string;
+    onInputChanged?: (inputId: number, inputValue: string) => void
 }
 
 const Input = (props: InputProps) => {
+    const onChangeText = (text: string) => {
+        if (props.onInputChanged) {
+            props.onInputChanged(String(props.id), text)
+        }
+    }
+
     return <View style={styles.container}>
         <Text style={styles.label}>{props.label}</Text>
         <View style={styles.inputContainer}>
             {props.icon &&
                 <props.iconPack name={props.icon} size={props.iconSize || 15} style={styles.icon} />
             }
-            <TextInput style={styles.input} />
+            <TextInput style={styles.input} onChangeText={onChangeText} />
         </View>
         {props.errorText &&
             <View style={styles.errorContainer}>
