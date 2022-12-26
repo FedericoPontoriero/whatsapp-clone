@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { View, StyleSheet, ImageBackground, ImageSourcePropType, TextInput, TouchableOpacity, KeyboardAvoidingView, } from 'react-native'
+import { View, StyleSheet, ImageBackground, ImageSourcePropType, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons'
 
@@ -15,7 +15,7 @@ const ChatScreen = () => {
 
     return (
         <SafeAreaView edges={['right', 'left', 'bottom']} style={styles.container}>
-            <KeyboardAvoidingView style={styles.screen} behavior='padding'>
+            <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={100}>
                 <ImageBackground style={styles.backgroundImage} source={backgroundImage}>
 
                 </ImageBackground>
