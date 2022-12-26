@@ -4,16 +4,11 @@ import { Feather, FontAwesome } from '@expo/vector-icons'
 import SubmitButton from '../components/SubmitButton'
 import Input from '../components/Input'
 import { validateEmail, validatePassword, validateString } from '../utils/validationConstraints'
+import { validateInput } from '../utils/actions/formActions'
 
 const SignUpForm = () => {
     const inputChangedHandler = (inputId: string, inputValue: string): void => {
-        if (inputId === "firstName" || inputId === 'lastName') {
-            validateString(inputId, inputValue)
-        } else if (inputId === 'email') {
-            validateEmail(inputId, inputValue)
-        } else if (inputId === 'password') {
-            validatePassword(inputId, inputValue)
-        }
+        validateInput(inputId, inputValue)
     }
 
     return (
@@ -22,6 +17,7 @@ const SignUpForm = () => {
                 id='firstName'
                 label="First name"
                 icon="user-o"
+                autoCapitalize='none'
                 iconPack={FontAwesome}
                 onInputChanged={inputChangedHandler} />
             <Input
@@ -29,15 +25,19 @@ const SignUpForm = () => {
                 label="Last name"
                 icon="user-o"
                 iconPack={FontAwesome}
+                autoCapitalize='none'
                 onInputChanged={inputChangedHandler} />
             <Input
                 id='email'
                 label="Email"
                 icon="mail"
                 iconPack={Feather}
+                autoCapitalize='none'
+                keyboardType="email-address"
                 onInputChanged={inputChangedHandler} />
             <Input
                 id='password'
+                secureTextEntry
                 label="Password"
                 icon="lock"
                 autoCapitalize="none"
