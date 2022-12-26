@@ -1,16 +1,63 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 import { Feather, FontAwesome } from '@expo/vector-icons'
 
 import SubmitButton from '../components/SubmitButton'
 import Input from '../components/Input'
-import { validateEmail, validatePassword, validateString } from '../utils/validationConstraints'
 import { validateInput } from '../utils/actions/formActions'
 
-const SignUpForm = () => {
-    const inputChangedHandler = (inputId: string, inputValue: string): void => {
-        validateInput(inputId, inputValue)
+type FormState = {
+    inputValidities: {
+        firstName: boolean,
+        lastName: boolean,
+        email: boolean,
+        password: boolean,
+    },
+    formIsValid: boolean
+}
+
+
+const reducer = (state: FormState, action: any) => {
+    const { validationResult, inputId } = action
+
+    const updatedValidities: any = {
+        ...state.inputValidities,
+        [inputId]: validationResult
     }
 
+    let updatedFormIsValid = true;
+
+    for (const key in updatedValidities) {
+        if (updatedValidities[key] !== undefined) {
+            updatedFormIsValid = false;
+            break
+        }
+    }
+
+    return {
+        inputValidities: updatedValidities,
+        formIsValid: updatedFormIsValid
+    }
+}
+
+const initialState: FormState = {
+    inputValidities: {
+        firstName: false,
+        lastName: false,
+        email: false,
+        password: false,
+    },
+    formIsValid: false
+}
+
+const SignUpForm = () => {
+    const [formState, dispatchFormState] = useReducer(
+        reducer,
+        initialState
+    )
+    const inputChangedHandler = (inputId: string, inputValue: string): void => {
+        const result = validateInput(inputId, inputValue)
+        dispatchFormState({ inputId, validationResult: result })
+    }
     return (
         <>
             <Input
@@ -45,6 +92,7 @@ const SignUpForm = () => {
                 onInputChanged={inputChangedHandler} />
             <SubmitButton
                 title="Sign up"
+                disabled={!formState.formIsValid}
                 onPress={() => { }}
                 style={{ marginTop: 20 }} />
         </>
