@@ -8,8 +8,8 @@ interface ChatListScreenProps {
 
 const ChatListScreen = ({ navigation: { navigate } }: ChatListScreenProps) => {
     return <View style={styles.container}>
-        <Text>Chat list screen </Text>
-        <Button title='Go to settings' onPress={() => navigate("ChatSettings")} />
+        <Text>Go to chat screen</Text>
+        <Button title='Go to settings' onPress={() => navigate("ChatScreen")} />
     </View>
 }
 
