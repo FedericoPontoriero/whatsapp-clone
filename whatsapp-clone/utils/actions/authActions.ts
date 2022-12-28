@@ -3,6 +3,8 @@ import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
 import { child, getDatabase, ref, set } from 'firebase/database'
 import { authenticate } from "../../store/authSlice"
 import { AnyAction, Dispatch } from "@reduxjs/toolkit"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 
 export const signUp = (firstName: string, lastName: string, email: string, password: string) => {
     return async (dispatch: Dispatch<AnyAction>) => {
@@ -16,6 +18,7 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
             const userData = await createUser(firstName, lastName, email, uid)
 
             dispatch(authenticate({ token: getIdTokenResult, userData }))
+            saveDataToStorage(getIdTokenResult.toString(), uid)
 
         } catch (err: any) {
             const errorCode = err.code
@@ -43,4 +46,11 @@ const createUser = async (firstName: string, lastName: string, email: string, us
     const dbRef = ref(getDatabase())
     const childRef = child(dbRef, `users/${userId}`)
     await set(childRef, userData)
+}
+
+const saveDataToStorage = (token: string, userId: string) => {
+    AsyncStorage.setItem("userData", JSON.stringify({
+        token,
+        userId,
+    }))
 }
