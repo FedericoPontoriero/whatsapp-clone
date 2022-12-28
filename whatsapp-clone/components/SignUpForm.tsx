@@ -1,43 +1,10 @@
-import React, { useReducer } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import { Feather, FontAwesome } from '@expo/vector-icons'
 
 import SubmitButton from '../components/SubmitButton'
 import Input from '../components/Input'
 import { validateInput } from '../utils/actions/formActions'
-
-type FormState = {
-    inputValidities: {
-        firstName: boolean,
-        lastName: boolean,
-        email: boolean,
-        password: boolean,
-    },
-    formIsValid: boolean
-}
-
-
-const reducer = (state: FormState, action: any) => {
-    const { validationResult, inputId } = action
-
-    const updatedValidities: any = {
-        ...state.inputValidities,
-        [inputId]: validationResult
-    }
-
-    let updatedFormIsValid = true;
-
-    for (const key in updatedValidities) {
-        if (updatedValidities[key] !== undefined) {
-            updatedFormIsValid = false;
-            break
-        }
-    }
-
-    return {
-        inputValidities: updatedValidities,
-        formIsValid: updatedFormIsValid
-    }
-}
+import { FormState, reducer } from '../utils/reducers/formReducer'
 
 const initialState: FormState = {
     inputValidities: {
@@ -54,10 +21,11 @@ const SignUpForm = () => {
         reducer,
         initialState
     )
-    const inputChangedHandler = (inputId: string, inputValue: string): void => {
+    const inputChangedHandler = useCallback((inputId: string, inputValue: string): void => {
         const result = validateInput(inputId, inputValue)
         dispatchFormState({ inputId, validationResult: result })
-    }
+    }, [dispatchFormState])
+
     return (
         <>
             <Input
