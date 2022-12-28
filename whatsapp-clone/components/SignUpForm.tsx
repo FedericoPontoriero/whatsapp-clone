@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 
 import SubmitButton from "../components/SubmitButton";
@@ -6,6 +6,8 @@ import Input from "../components/Input";
 import { validateInput } from "../utils/actions/formActions";
 import { FormState, reducer } from "../utils/reducers/formReducer";
 import { signUp } from "../utils/actions/authActions";
+import { ActivityIndicator, Alert } from "react-native";
+import colors from "../constants/colors";
 
 const initialState: FormState = {
   inputValues: {
@@ -24,6 +26,8 @@ const initialState: FormState = {
 };
 
 const SignUpForm = () => {
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string): void => {
@@ -33,13 +37,26 @@ const SignUpForm = () => {
     [dispatchFormState]
   );
 
-  const authHandler = () => {
-    signUp(
-      formState.inputValues.firstName,
-      formState.inputValues.lastName,
-      formState.inputValues.email,
-      formState.inputValues.password
-    );
+  useEffect(() => {
+    if (error) {
+      Alert.alert("An error has occurred", error, [{ text: "Ok" }])
+    }
+  }, [error])
+
+  const authHandler = async () => {
+    try {
+      setIsLoading(true)
+      await signUp(
+        formState.inputValues.firstName,
+        formState.inputValues.lastName,
+        formState.inputValues.email,
+        formState.inputValues.password
+      );
+      setError(null)
+    } catch (err: any) {
+      setError(err.message)
+      setIsLoading(false)
+    }
   };
 
   return (
@@ -82,12 +99,16 @@ const SignUpForm = () => {
         errorText={formState.inputValidities["password"]}
         onInputChanged={inputChangedHandler}
       />
-      <SubmitButton
-        title="Sign up"
-        disabled={!formState.formIsValid}
-        onPress={authHandler}
-        style={{ marginTop: 20 }}
-      />
+      {
+        isLoading ?
+          <ActivityIndicator size={"small"} color={colors.primary} style={{ marginTop: 10 }} /> :
+          <SubmitButton
+            title="Sign up"
+            disabled={!formState.formIsValid}
+            onPress={authHandler}
+            style={{ marginTop: 20 }}
+          />
+      }
     </>
   );
 };
