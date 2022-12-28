@@ -6,6 +6,8 @@ import * as Font from "expo-font";
 import "react-native-gesture-handler";
 
 import AppNavigator from "./navigation/AppNavigator";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 LogBox.ignoreLogs(['AsyncStorage has been extracted'])
 
@@ -50,9 +52,11 @@ export default function App() {
   if (!appIsLoaded) return null;
 
   return (
-    <SafeAreaProvider onLayout={onLayout} style={styles.container}>
-      <AppNavigator />
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <SafeAreaProvider onLayout={onLayout} style={styles.container}>
+        <AppNavigator />
+      </SafeAreaProvider>
+    </Provider>
   );
 }
 
