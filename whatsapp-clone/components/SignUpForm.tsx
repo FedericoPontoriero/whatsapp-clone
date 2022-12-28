@@ -34,6 +34,7 @@ const SignUpForm = () => {
                 icon="user-o"
                 autoCapitalize='none'
                 iconPack={FontAwesome}
+                errorText={formState.inputValidities['firstName']}
                 onInputChanged={inputChangedHandler} />
             <Input
                 id='lastName'
@@ -41,6 +42,7 @@ const SignUpForm = () => {
                 icon="user-o"
                 iconPack={FontAwesome}
                 autoCapitalize='none'
+                errorText={formState.inputValidities['lastName']}
                 onInputChanged={inputChangedHandler} />
             <Input
                 id='email'
@@ -49,6 +51,7 @@ const SignUpForm = () => {
                 iconPack={Feather}
                 autoCapitalize='none'
                 keyboardType="email-address"
+                errorText={formState.inputValidities['email']}
                 onInputChanged={inputChangedHandler} />
             <Input
                 id='password'
@@ -57,6 +60,7 @@ const SignUpForm = () => {
                 icon="lock"
                 autoCapitalize="none"
                 iconPack={Feather}
+                errorText={formState.inputValidities['password']}
                 onInputChanged={inputChangedHandler} />
             <SubmitButton
                 title="Sign up"

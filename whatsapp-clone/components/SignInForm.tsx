@@ -45,6 +45,7 @@ const SignInForm = () => {
                 keyboardType='email-address'
                 iconPack={Feather}
                 onInputChanged={inputChangedHandler}
+                errorText={formState.inputValidities['email']}
             />
             <Input
                 id='password'
@@ -54,6 +55,7 @@ const SignInForm = () => {
                 autoCapitalize='none'
                 secureTextEntry
                 onInputChanged={inputChangedHandler}
+                errorText={formState.inputValidities['password']}
             />
             <SubmitButton
                 title="Sign in"
