@@ -57,13 +57,13 @@ const SignUpForm = () => {
         formState.inputValues.email,
         formState.inputValues.password
       )
-      dispatch(action)
+      await dispatch(action)
       setError(null)
     } catch (err: any) {
       setError(err.message)
       setIsLoading(false)
     }
-  }, [dispatch]);
+  }, [dispatch, formState]);
 
   return (
     <>

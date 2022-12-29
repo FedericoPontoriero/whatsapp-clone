@@ -1,11 +1,12 @@
 import { getFirebaseApp } from "../firebaseHelper"
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { child, getDatabase, ref, set } from 'firebase/database'
-import { authenticate } from "../../store/authSlice"
+import { authenticate, logout } from "../../store/authSlice"
 import { AnyAction, Dispatch } from "@reduxjs/toolkit"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getUserData } from "./userActions"
 
+let timer: ReturnType<typeof setTimeout>;
 
 export const signUp = (firstName: string, lastName: string, email: string, password: string) => {
     return async (dispatch: Dispatch<AnyAction>) => {
@@ -15,11 +16,19 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
         try {
             const result = await createUserWithEmailAndPassword(auth, email, password)
             const { uid, getIdTokenResult } = result.user;
+            const accessToken = await getIdTokenResult()
+            const expiryDate = new Date(accessToken.expirationTime)
+            const timeNow = new Date()
+            const timeUntilExpiry = Number(expiryDate) - Number(timeNow)
 
             const userData = await createUser(firstName, lastName, email, uid)
 
-            dispatch(authenticate({ token: getIdTokenResult, userData }))
-            saveDataToStorage(getIdTokenResult.toString(), uid)
+            dispatch(authenticate({ token: accessToken, userData }))
+            saveDataToStorage(accessToken.token, uid, expiryDate)
+
+            timer = setTimeout(() => {
+                dispatch(userLogout())
+            }, timeUntilExpiry)
 
         } catch (err: any) {
             const errorCode = err.code
@@ -33,6 +42,14 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
     }
 }
 
+export const userLogout = (): any => {
+    return async (dispatch: Dispatch<AnyAction>) => {
+        AsyncStorage.clear()
+        clearTimeout(timer);
+        dispatch(logout(true))
+    }
+}
+
 export const signIn = (email: string, password: string) => {
     return async (dispatch: Dispatch<AnyAction>) => {
         const app = getFirebaseApp();
@@ -41,18 +58,26 @@ export const signIn = (email: string, password: string) => {
         try {
             const result = await signInWithEmailAndPassword(auth, email, password)
             const { uid, getIdTokenResult } = result.user;
+            const accessToken = await getIdTokenResult()
+            const expiryDate = new Date(accessToken.expirationTime)
+            const timeNow = new Date()
+            const timeUntilExpiry = Number(expiryDate) - Number(timeNow)
 
             const userData = await getUserData(uid)
 
-            dispatch(authenticate({ token: getIdTokenResult, userData }))
-            saveDataToStorage(getIdTokenResult.toString(), uid)
+            dispatch(authenticate({ token: accessToken, userData }))
+            saveDataToStorage(accessToken.token, uid, expiryDate)
+
+            timer = setTimeout(() => {
+                dispatch(userLogout())
+            }, timeUntilExpiry)
 
         } catch (err: any) {
             const errorCode = err.code
             let message = "Something went wrong"
 
-            if (errorCode === "auth/email-already-in-use") {
-                message = 'This email is already in use'
+            if (errorCode === "auth/wrong-password" || errorCode === "auth/user-not-found") {
+                message = 'The username or password was incorrect'
             }
             throw new Error(message)
         }
@@ -75,9 +100,10 @@ const createUser = async (firstName: string, lastName: string, email: string, us
     await set(childRef, userData)
 }
 
-const saveDataToStorage = (token: string, userId: string) => {
+const saveDataToStorage = (token: string, userId: string, expiryDate: Date) => {
     AsyncStorage.setItem("userData", JSON.stringify({
         token,
         userId,
+        expiryDate
     }))
 }
