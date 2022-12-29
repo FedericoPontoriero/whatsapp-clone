@@ -1,10 +1,13 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 
 import SubmitButton from "../components/SubmitButton";
 import Input from "../components/Input";
 import { validateInput } from "../utils/actions/formActions";
 import { reducer } from "../utils/reducers/formReducer";
+import { signIn } from "../utils/actions/authActions";
+import { Alert } from "react-native";
+import { useDispatch } from "react-redux";
 
 type FormStateSignIn = {
   inputValues: {
@@ -32,6 +35,10 @@ const initialState: FormStateSignIn = {
 
 const SignInForm = () => {
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
+  const dispatch = useDispatch();
+
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string): void => {
@@ -40,6 +47,27 @@ const SignInForm = () => {
     },
     [dispatchFormState]
   );
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert("An error has occurred", error, [{ text: "Ok" }]);
+    }
+  }, [error]);
+
+  const authHandler = useCallback( async () => {
+    try {
+      setIsLoading(true);
+      const action: any = signIn(
+        formState.inputValues.email,
+        formState.inputValues.password
+      );
+      dispatch(action);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+      setIsLoading(false);
+    }
+  } ,[dispatch]);
 
   return (
     <>
@@ -65,7 +93,7 @@ const SignInForm = () => {
       />
       <SubmitButton
         title="Sign in"
-        onPress={() => {}}
+        onPress={authHandler}
         disabled={!formState.formIsValid}
         style={{ marginTop: 20 }}
       />

@@ -1,9 +1,10 @@
 import { getFirebaseApp } from "../firebaseHelper"
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { child, getDatabase, ref, set } from 'firebase/database'
 import { authenticate } from "../../store/authSlice"
 import { AnyAction, Dispatch } from "@reduxjs/toolkit"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { getUserData } from "./userActions"
 
 
 export const signUp = (firstName: string, lastName: string, email: string, password: string) => {
@@ -16,6 +17,32 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
             const { uid, getIdTokenResult } = result.user;
 
             const userData = await createUser(firstName, lastName, email, uid)
+
+            dispatch(authenticate({ token: getIdTokenResult, userData }))
+            saveDataToStorage(getIdTokenResult.toString(), uid)
+
+        } catch (err: any) {
+            const errorCode = err.code
+            let message = "Something went wrong"
+
+            if (errorCode === "auth/email-already-in-use") {
+                message = 'This email is already in use'
+            }
+            throw new Error(message)
+        }
+    }
+}
+
+export const signIn = (email: string, password: string) => {
+    return async (dispatch: Dispatch<AnyAction>) => {
+        const app = getFirebaseApp();
+        const auth = getAuth(app)
+
+        try {
+            const result = await signInWithEmailAndPassword(auth, email, password)
+            const { uid, getIdTokenResult } = result.user;
+
+            const userData = await getUserData(uid)
 
             dispatch(authenticate({ token: getIdTokenResult, userData }))
             saveDataToStorage(getIdTokenResult.toString(), uid)

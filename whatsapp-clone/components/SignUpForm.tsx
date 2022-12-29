@@ -48,7 +48,7 @@ const SignUpForm = () => {
     }
   }, [error])
 
-  const authHandler = async () => {
+  const authHandler = useCallback(async () => {
     try {
       setIsLoading(true)
       const action: any = signUp(
@@ -63,7 +63,7 @@ const SignUpForm = () => {
       setError(err.message)
       setIsLoading(false)
     }
-  };
+  }, [dispatch]);
 
   return (
     <>

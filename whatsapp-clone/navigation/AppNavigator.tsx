@@ -5,17 +5,22 @@ import MainNavigator from './MainNavigator';
 import AuthScreen from '../screens/AuthScreen';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import StartUpScreen from '../screens/StartUpScreen';
 
-const AppNavigator = (props: any) => {
+const AppNavigator = () => {
   const isAuth = useSelector((state: RootState) => state.auth.token !== null && state.auth.token !== "")
+  const didTryAutoLogin = useSelector((state: RootState) => state.auth.didTryAutoLogin)
 
   return (
     <NavigationContainer>
       {isAuth &&
         <MainNavigator children={""} />
       }
-      {!isAuth &&
+      {!isAuth && didTryAutoLogin &&
         <AuthScreen />
+      }
+      {!isAuth && !didTryAutoLogin &&
+        <StartUpScreen />
       }
     </NavigationContainer>
   )
