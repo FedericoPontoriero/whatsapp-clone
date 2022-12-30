@@ -1,6 +1,6 @@
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import React, { useCallback, useReducer, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/Input";
 import PageContainer from "../components/PageContainer";
@@ -47,22 +47,24 @@ const SettingsScreen = () => {
     },
     [dispatchFormState]
   );
+  const dispatch = useDispatch();
 
-  const saveHandler = async () => {
+  const saveHandler = useCallback(async () => {
     const updatedValues = formState.inputValues;
     try {
       setIsLoading(true);
       await updateSignedInUserData(userData.userId, updatedValues);
       dispatch(updateLoggedInUserData({ newData: updatedValues }));
       setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
     } catch (err) {
       console.log(err);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const dispatch = useDispatch();
+  }, [formState, dispatch]);
 
   return (
     <PageContainer style={styles.container}>
@@ -108,21 +110,23 @@ const SettingsScreen = () => {
         onInputChanged={inputChangedHandler}
         initialValue={userData.about}
       />
-      {showSuccessMessage && <Text>Saved!</Text>}
-      {isLoading ? (
-        <ActivityIndicator
-          size={"small"}
-          color={colors.primary}
-          style={{ marginTop: 10 }}
-        />
-      ) : (
-        <SubmitButton
-          title="Save"
-          onPress={saveHandler}
-          disabled={!formState.formIsValid}
-          style={{ marginTop: 20 }}
-        />
-      )}
+      <View style={{ marginTop: 20 }}>
+        {showSuccessMessage && <Text>Saved!</Text>}
+        {isLoading ? (
+          <ActivityIndicator
+            size={"small"}
+            color={colors.primary}
+            style={{ marginTop: 10 }}
+          />
+        ) : (
+          <SubmitButton
+            title="Save"
+            onPress={saveHandler}
+            disabled={!formState.formIsValid}
+            style={{ marginTop: 20 }}
+          />
+        )}
+      </View>
       <SubmitButton
         title="Logout"
         color={colors.red}
