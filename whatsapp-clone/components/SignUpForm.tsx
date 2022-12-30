@@ -75,6 +75,7 @@ const SignUpForm = () => {
         iconPack={FontAwesome}
         errorText={formState.inputValidities["firstName"]}
         onInputChanged={inputChangedHandler}
+        initialValue={formState.inputValues.firstName}
       />
       <Input
         id="lastName"
@@ -83,6 +84,7 @@ const SignUpForm = () => {
         iconPack={FontAwesome}
         autoCapitalize="none"
         errorText={formState.inputValidities["lastName"]}
+        initialValue={formState.inputValues.lastName}
         onInputChanged={inputChangedHandler}
       />
       <Input
@@ -93,6 +95,7 @@ const SignUpForm = () => {
         autoCapitalize="none"
         keyboardType="email-address"
         errorText={formState.inputValidities["email"]}
+        initialValue={formState.inputValues.email}
         onInputChanged={inputChangedHandler}
       />
       <Input
@@ -103,6 +106,7 @@ const SignUpForm = () => {
         autoCapitalize="none"
         iconPack={Feather}
         errorText={formState.inputValidities["password"]}
+        initialValue={formState.inputValues.password}
         onInputChanged={inputChangedHandler}
       />
       {

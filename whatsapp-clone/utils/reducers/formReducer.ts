@@ -3,13 +3,15 @@ export type FormState = {
         firstName: string,
         lastName: string,
         email: string,
-        password: string,
+        password?: string,
+        about?: string,
     },
     inputValidities: {
         firstName: boolean,
         lastName: boolean,
         email: boolean,
-        password: boolean,
+        password?: boolean,
+        about?: boolean,
     },
     formIsValid: boolean
 }

@@ -81,6 +81,7 @@ const SignInForm = () => {
         iconPack={Feather}
         onInputChanged={inputChangedHandler}
         errorText={formState.inputValidities["email"]}
+        initialValue={formState.inputValues.email}
       />
       <Input
         id="password"
@@ -90,6 +91,7 @@ const SignInForm = () => {
         autoCapitalize="none"
         secureTextEntry
         onInputChanged={inputChangedHandler}
+        initialValue={formState.inputValues.password}
         errorText={formState.inputValidities["password"]}
       />
       {isLoading ?

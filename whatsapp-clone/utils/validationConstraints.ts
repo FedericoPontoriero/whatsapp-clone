@@ -46,3 +46,28 @@ export const validatePassword = (id: string, value: string) => {
 
     return validationResult && validationResult[id]
 }
+
+export const validateLength = (id: string, value: string, minLength: number, maxLength: number, allowEmpty: boolean) => {
+    const constraints = {
+        presence: { allowEmpty },
+        length: {
+            minimum: 0,
+            maximum: 150,
+        }
+    }
+    if (!allowEmpty || value !== "") {
+        constraints.length = {
+            minimum: 0,
+            maximum: 150,
+        }
+        if (minLength !== null) {
+            constraints.length.minimum = minLength
+        }
+        if (maxLength !== null) {
+            constraints.length.maximum = maxLength
+        }
+    }
+    const validationResult = validate({ [id]: value }, { [id]: constraints })
+
+    return validationResult && validationResult[id]
+}

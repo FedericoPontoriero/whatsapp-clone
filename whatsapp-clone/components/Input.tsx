@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StyleSheet, Text, TextInput, TextInputProps, View, ViewProps } from "react-native"
 
 import colors from "../constants/colors"
@@ -9,11 +10,15 @@ interface InputProps extends TextInputProps {
     iconSize?: number;
     errorText?: string;
     id?: string;
-    onInputChanged?: (inputId: string, inputValue: string) => void
+    onInputChanged?: (inputId: string, inputValue: string) => void;
+    initialValue?: string | null;
 }
 
 const Input = (props: InputProps) => {
+    const [value, setValue] = useState(props.initialValue)
+
     const onChangeText = (text: string) => {
+        setValue(text)
         if (props.onInputChanged) {
             props.onInputChanged(String(props.id), text)
         }
@@ -25,7 +30,7 @@ const Input = (props: InputProps) => {
             {props.icon &&
                 <props.iconPack name={props.icon} size={props.iconSize || 15} style={styles.icon} />
             }
-            <TextInput {...props} style={styles.input} onChangeText={onChangeText} />
+            <TextInput {...props} style={styles.input} onChangeText={onChangeText} value={value} />
         </View>
         {props.errorText &&
             <View style={styles.errorContainer}>
