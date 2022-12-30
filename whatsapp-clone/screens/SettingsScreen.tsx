@@ -1,10 +1,17 @@
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import React, { useCallback, useReducer, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/Input";
 import PageContainer from "../components/PageContainer";
 import { PageTitle } from "../components/PageTitle";
+import ProfileImage from "../components/ProfileImage";
 import SubmitButton from "../components/SubmitButton";
 import colors from "../constants/colors";
 import { updateLoggedInUserData } from "../store/authSlice";
@@ -22,12 +29,17 @@ const SettingsScreen = () => {
 
   const userData = useSelector((state: RootState) => state.auth.userData);
 
+  const firstName = userData.firstName || "";
+  const lastName = userData.lastName || "";
+  const email = userData.email || "";
+  const about = userData.about || "";
+
   const initialState: FormState = {
     inputValues: {
-      firstName: userData.firstName || "",
-      lastName: userData.lastName || "",
-      email: userData.email || "",
-      about: userData.about || "",
+      firstName,
+      lastName,
+      email,
+      about,
     },
     inputValidities: {
       firstName: undefined,
@@ -66,73 +78,88 @@ const SettingsScreen = () => {
     }
   }, [formState, dispatch]);
 
+  const hasChanges = () => {
+    const currentValues = formState.inputValues;
+    return (
+      currentValues.firstName !== firstName ||
+      currentValues.lastName !== lastName ||
+      currentValues.email !== email ||
+      currentValues.about !== about
+    );
+  };
+
   return (
     <PageContainer style={styles.container}>
       <PageTitle text="Settings" />
-      <Input
-        id="firstName"
-        label="First name"
-        icon="user-o"
-        autoCapitalize="none"
-        iconPack={FontAwesome}
-        errorText={formState.inputValidities["firstName"]}
-        onInputChanged={inputChangedHandler}
-        initialValue={userData.firstName}
-      />
-      <Input
-        id="lastName"
-        label="Last name"
-        icon="user-o"
-        iconPack={FontAwesome}
-        autoCapitalize="none"
-        errorText={formState.inputValidities["lastName"]}
-        onInputChanged={inputChangedHandler}
-        initialValue={userData.lastName}
-      />
-      <Input
-        id="email"
-        label="Email"
-        icon="mail"
-        iconPack={Feather}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        errorText={formState.inputValidities["email"]}
-        onInputChanged={inputChangedHandler}
-        initialValue={userData.email}
-      />
-      <Input
-        id="about"
-        label="About"
-        icon="user-o"
-        iconPack={FontAwesome}
-        autoCapitalize="none"
-        errorText={formState.inputValidities["about"]}
-        onInputChanged={inputChangedHandler}
-        initialValue={userData.about}
-      />
-      <View style={{ marginTop: 20 }}>
-        {showSuccessMessage && <Text>Saved!</Text>}
-        {isLoading ? (
-          <ActivityIndicator
-            size={"small"}
-            color={colors.primary}
-            style={{ marginTop: 10 }}
-          />
-        ) : (
-          <SubmitButton
-            title="Save"
-            onPress={saveHandler}
-            disabled={!formState.formIsValid}
-            style={{ marginTop: 20 }}
-          />
-        )}
-      </View>
-      <SubmitButton
-        title="Logout"
-        color={colors.red}
-        onPress={() => dispatch(userLogout())}
-        style={{ marginTop: 20 }}
-      />
+      <ScrollView contentContainerStyle={styles.formContainer}>
+        <ProfileImage size={80} />
+        <Input
+          id="firstName"
+          label="First name"
+          icon="user-o"
+          autoCapitalize="none"
+          iconPack={FontAwesome}
+          errorText={formState.inputValidities["firstName"]}
+          onInputChanged={inputChangedHandler}
+          initialValue={userData.firstName}
+        />
+        <Input
+          id="lastName"
+          label="Last name"
+          icon="user-o"
+          iconPack={FontAwesome}
+          autoCapitalize="none"
+          errorText={formState.inputValidities["lastName"]}
+          onInputChanged={inputChangedHandler}
+          initialValue={userData.lastName}
+        />
+        <Input
+          id="email"
+          label="Email"
+          icon="mail"
+          iconPack={Feather}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          errorText={formState.inputValidities["email"]}
+          onInputChanged={inputChangedHandler}
+          initialValue={userData.email}
+        />
+        <Input
+          id="about"
+          label="About"
+          icon="user-o"
+          iconPack={FontAwesome}
+          autoCapitalize="none"
+          errorText={formState.inputValidities["about"]}
+          onInputChanged={inputChangedHandler}
+          initialValue={userData.about}
+        />
+        <View style={{ marginTop: 20 }}>
+          {showSuccessMessage && <Text>Saved!</Text>}
+          {isLoading ? (
+            <ActivityIndicator
+              size={"small"}
+              color={colors.primary}
+              style={{ marginTop: 10 }}
+            />
+          ) : (
+            hasChanges() && (
+              <SubmitButton
+                title="Save"
+                onPress={saveHandler}
+                disabled={!formState.formIsValid}
+                style={{ marginTop: 20 }}
+              />
+            )
+          )}
+        </View>
+        <SubmitButton
+          title="Logout"
+          color={colors.red}
+          onPress={() => dispatch(userLogout())}
+          style={{ marginTop: 20 }}
+        />
+      </ScrollView>{" "}
     </PageContainer>
   );
 };
@@ -141,6 +168,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  formContainer: {
+    alignItems: 'center',
+  }
 });
 
 export default SettingsScreen;
