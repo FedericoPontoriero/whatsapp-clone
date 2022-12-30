@@ -1,6 +1,6 @@
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import React, { useCallback, useReducer, useState } from "react";
-import { ActivityIndicator, StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, Text } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/Input";
 import PageContainer from "../components/PageContainer";
@@ -18,6 +18,7 @@ import { FormState, reducer } from "../utils/reducers/formReducer";
 
 const SettingsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const userData = useSelector((state: RootState) => state.auth.userData);
 
@@ -53,6 +54,7 @@ const SettingsScreen = () => {
       setIsLoading(true);
       await updateSignedInUserData(userData.userId, updatedValues);
       dispatch(updateLoggedInUserData({ newData: updatedValues }));
+      setShowSuccessMessage(true);
     } catch (err) {
       console.log(err);
     } finally {
@@ -106,6 +108,7 @@ const SettingsScreen = () => {
         onInputChanged={inputChangedHandler}
         initialValue={userData.about}
       />
+      {showSuccessMessage && <Text>Saved!</Text>}
       {isLoading ? (
         <ActivityIndicator
           size={"small"}
