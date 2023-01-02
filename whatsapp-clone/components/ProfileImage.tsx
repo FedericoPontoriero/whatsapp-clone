@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { FontAwesome } from "@expo/vector-icons"
 
@@ -8,14 +8,28 @@ import { launchImagePicker } from '../utils/imagePickerHelper'
 const userImage = require('../assets/userImage.jpg')
 
 const ProfileImage = (props: any) => {
-  const pickImage = () => {
-    launchImagePicker()
+  const source = props.uri ? { uri: props.uri } : userImage
+
+  const [image, setImage] = useState(source)
+
+  const pickImage = async () => {
+    try {
+      const tempUri = await launchImagePicker()
+      if (!tempUri) return
+
+      // Uploading the image
+
+      // Set the image
+
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
     <TouchableOpacity onPress={pickImage}>
       <Image
-        source={userImage} style={{ ...styles.image, ...{ width: props.size, height: props.size } }} />
+        source={image} style={{ ...styles.image, ...{ width: props.size, height: props.size } }} />
       <View style={styles.editIconContainer}>
         <FontAwesome name='pencil' size={15} color='black' />
       </View>
