@@ -1,5 +1,9 @@
 import * as ImagePicker from 'expo-image-picker'
 import { Platform } from 'react-native'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import uuid from 'react-native-uuid'
+
+import { getFirebaseApp } from './firebaseHelper';
 
 export const launchImagePicker = async () => {
   await checkMediaPermissions();
@@ -13,6 +17,32 @@ export const launchImagePicker = async () => {
   if (!result.canceled) {
     return result.uri
   }
+}
+
+export const uploadImageAsync = async (uri: string) => {
+  const app = getFirebaseApp();
+  const blob: Blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response)
+    };
+
+    xhr.onerror = function (e) {
+      console.log(e);
+      reject(new TypeError("Network request failed"))
+    };
+
+    xhr.responseType = "blob"
+    xhr.open("GET", uri, true)
+    xhr.send()
+  })
+
+  const pathFolder = 'profilePics'
+  const storageRef = ref(getStorage(app), `${pathFolder}/${uuid.v4()}`)
+
+  await uploadBytesResumable(storageRef, blob)
+
+  return await getDownloadURL(storageRef)
 }
 
 const checkMediaPermissions = async () => {

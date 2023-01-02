@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { FontAwesome } from "@expo/vector-icons"
 
 import colors from '../constants/colors'
-import { launchImagePicker } from '../utils/imagePickerHelper'
+import { launchImagePicker, uploadImageAsync } from '../utils/imagePickerHelper'
 
 const userImage = require('../assets/userImage.jpg')
 
@@ -18,8 +18,11 @@ const ProfileImage = (props: any) => {
       if (!tempUri) return
 
       // Uploading the image
+      const uploadUrl = await uploadImageAsync(tempUri)
+      if (!uploadUrl) throw new Error('Could not upload image')
 
       // Set the image
+      setImage({ uri: uploadUrl })
 
     } catch (err) {
       console.log(err);
