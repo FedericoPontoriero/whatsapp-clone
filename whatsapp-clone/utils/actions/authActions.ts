@@ -109,8 +109,11 @@ const saveDataToStorage = (token: string, userId: string, expiryDate: Date) => {
 }
 
 export const updateSignedInUserData = async (userId: string, newData: any) => {
-    const firstLast = `${newData.firstName} ${newData.lastName}`.toLocaleLowerCase()
-    newData.firstLast = firstLast
+    if (newData.firtsName && newData.lastName) {
+        const firstLast = `${newData.firstName} ${newData.lastName}`.toLocaleLowerCase()
+        newData.firstLast = firstLast
+    }
+
     const dbRef = ref(getDatabase())
     const childRef = child(dbRef, `users/${userId}`)
     await update(childRef, newData)
