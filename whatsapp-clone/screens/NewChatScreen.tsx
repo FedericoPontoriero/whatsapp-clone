@@ -3,11 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator, TextInput, FlatList } from 'react-native'
 import { NavigationScreenProp } from 'react-navigation'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+import { useSelector } from 'react-redux'
 
 import CustomHeaderButton from '../components/CustomHeaderButton'
+import DataItem from '../components/DataItem'
 import PageContainer from '../components/PageContainer'
 import colors from '../constants/colors'
 import commonStyles from '../constants/commonStyles'
+import { RootState } from '../store/store'
 import { searchUsers } from '../utils/actions/userActions'
 
 interface ChatListScreenProps {
@@ -19,6 +22,8 @@ const NewChatScreen = (props: ChatListScreenProps) => {
   const [users, setUsers] = useState<any>()
   const [noResultsFound, setNoResultsFound] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
+
+  const userData = useSelector((state: RootState) => state.auth.userData);
 
   useEffect(() => {
     props.navigation.setParams({
@@ -42,6 +47,7 @@ const NewChatScreen = (props: ChatListScreenProps) => {
       setIsLoading(true);
 
       const usersResult = await searchUsers(searchTerm)
+      delete usersResult[userData.userId]
       setUsers(usersResult)
 
       if (Object.keys(usersResult).length === 0) setNoResultsFound(true)
@@ -53,6 +59,12 @@ const NewChatScreen = (props: ChatListScreenProps) => {
 
     return () => clearTimeout(delaySearch)
   }, [searchTerm])
+
+  const userPressed = userId => {
+    props.navigation.navigate("ChatList", {
+      selectedUserId: userId
+    })
+  }
 
   return <PageContainer>
     <View style={styles.searchContainer}>
@@ -75,7 +87,13 @@ const NewChatScreen = (props: ChatListScreenProps) => {
         data={Object.keys(users)}
         renderItem={(itemData) => {
           const userId = itemData.item
-          return <Text>{userId}</Text>
+          const userData = users[userId]
+          return <DataItem
+            onPress={() => userPressed(userId)}
+            title={`${userData.firstName} ${userData.lastName}`}
+            subTitle={userData.about}
+            image={userData.profilePicture}
+          />
         }}
       />
     }

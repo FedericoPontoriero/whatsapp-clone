@@ -4,10 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons'
 
 import colors from '../constants/colors';
+import { RouteProp } from '@react-navigation/native';
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
-const ChatScreen = () => {
+interface ChatScreenProps {
+    route: RouteProp<{ params: { newChatData: string } }>
+}
+const ChatScreen = (props: ChatScreenProps) => {
     const [messageText, setMessageText] = useState("")
+
+    const chatData = props.route?.params?.newChatData
 
     const sendMessage = useCallback(() => {
         setMessageText("")

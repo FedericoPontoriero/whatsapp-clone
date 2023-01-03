@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, TouchableOpacityProps, View, ViewProps } from 'react-native'
 import { FontAwesome } from "@expo/vector-icons"
 
 import colors from '../constants/colors'
@@ -13,7 +13,8 @@ const userImage = require('../assets/userImage.jpg')
 interface ProfileImageProps {
   size: number
   uri: string
-  userId: string
+  showEditButton: boolean
+  userId?: string
 }
 
 const ProfileImage = (props: ProfileImageProps) => {
@@ -22,6 +23,9 @@ const ProfileImage = (props: ProfileImageProps) => {
 
   const [image, setImage] = useState(source)
   const [isLoading, setIsLoading] = useState(false)
+
+  const showEditButton = props.showEditButton && props.showEditButton === true;
+
   const userId = props.userId
 
   const pickImage = async () => {
@@ -50,17 +54,22 @@ const ProfileImage = (props: ProfileImageProps) => {
     }
   }
 
+  const Container: any = showEditButton ? TouchableOpacity : View
+
   return (
-    <TouchableOpacity onPress={pickImage}>
+    <Container onPress={pickImage}>
       {isLoading ? <View style={styles.loadingContainer}>
         <ActivityIndicator size={'small'} color={colors.primary} /></View> :
         <Image
           source={image} style={{ ...styles.image, ...{ width: props.size, height: props.size } }} />
       }
-      <View style={styles.editIconContainer}>
-        <FontAwesome name='pencil' size={15} color='black' />
-      </View>
-    </TouchableOpacity>
+      {
+        showEditButton && !isLoading &&
+        <View style={styles.editIconContainer}>
+          <FontAwesome name='pencil' size={15} color='black' />
+        </View>
+      }
+    </Container>
   )
 }
 
