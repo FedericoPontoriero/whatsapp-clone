@@ -5,12 +5,16 @@ import { Feather } from '@expo/vector-icons'
 
 import colors from '../constants/colors';
 import { RouteProp } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
 interface ChatScreenProps {
     route: RouteProp<{ params: { newChatData: string } }>
 }
 const ChatScreen = (props: ChatScreenProps) => {
+    const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
+
     const [messageText, setMessageText] = useState("")
 
     const chatData = props.route?.params?.newChatData
