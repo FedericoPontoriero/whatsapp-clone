@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Button, TextInput } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, TextInput, FlatList } from 'react-native'
 import { NavigationScreenProp } from 'react-navigation'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 
@@ -42,6 +42,10 @@ const NewChatScreen = (props: ChatListScreenProps) => {
       setIsLoading(true);
 
       const usersResult = await searchUsers(searchTerm)
+      setUsers(usersResult)
+
+      if (Object.keys(usersResult).length === 0) setNoResultsFound(true)
+      else setNoResultsFound(false)
 
       setIsLoading(false)
 
@@ -58,6 +62,24 @@ const NewChatScreen = (props: ChatListScreenProps) => {
         style={styles.searchBox}
         onChangeText={(text) => setSearchTerm(text)} />
     </View>
+    {
+      isLoading &&
+      <View style={commonStyles.center}>
+        <ActivityIndicator size={'large'} color={colors.primary} />
+      </View>
+    }
+
+    {
+      !isLoading && !noResultsFound && users &&
+      <FlatList
+        data={Object.keys(users)}
+        renderItem={(itemData) => {
+          const userId = itemData.item
+          return <Text>{userId}</Text>
+        }}
+      />
+    }
+
     {
       !isLoading && !users && (
         <View style={commonStyles.center}>
