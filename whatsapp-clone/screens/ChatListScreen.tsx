@@ -1,6 +1,6 @@
 import { RouteProp } from '@react-navigation/native'
 import React, { useEffect } from 'react'
-import { View, Text, StyleSheet, Button } from 'react-native'
+import { View, Text, StyleSheet, Button, FlatList } from 'react-native'
 import { NavigationScreenProp } from 'react-navigation'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { useSelector } from 'react-redux'
@@ -17,7 +17,11 @@ const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
     const selectedUser = props.route?.params?.selectedUserId
 
     const userData: any = useSelector<RootState>(state => state.auth.userData)
-    const userChats: any = useSelector<RootState>(state => state.chats.chatsData)
+    const storedUsers: any = useSelector<RootState>(state => state.users.storedUsers)
+    const userChats: any = useSelector<RootState>(state => {
+        const chatsData = state.chats.chatsData
+        return Object.values(chatsData)
+    })
 
     useEffect(() => {
         props.navigation.setParams({
@@ -41,10 +45,16 @@ const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
         props.navigation.navigate("ChatScreen", navigationProps)
     }, [props.route?.params])
 
-    return <View style={styles.container}>
-        <Text>Go to chat screen</Text>
-        <Button title='Go Chat Screen' onPress={() => props.navigation.navigate("ChatScreen")} />
-    </View>
+    return <FlatList
+        data={userChats}
+        renderItem={(itemData) => {
+            const chatData = itemData.item
+            const otherUserId = chatData.users.find((uid) => uid !== userData.userId)
+            return <Text>
+                {chatData}
+            </Text>
+        }}
+    />
 }
 
 const styles = StyleSheet.create({

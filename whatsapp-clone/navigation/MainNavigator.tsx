@@ -12,11 +12,12 @@ import NewChatScreen from "../screens/NewChatScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { getFirebaseApp } from "../utils/firebaseHelper";
-import { child, getDatabase, off, onValue, ref } from "firebase/database";
+import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
 import { setChatsData } from "../store/chatSlice";
 import { ActivityIndicator, View } from "react-native";
 import colors from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
+import { setStoredUsers } from "../store/userSlice";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -123,6 +124,23 @@ const MainNavigator = (props: MainNavigatorProps) => {
 
           if (data) {
             data.key = chatSnapshot.key
+
+            data.users.forEach(userId => {
+              if (storedUsers[userId]) return;
+
+              const userRef = child(dbRef, `users/${userId}`)
+              get(userRef)
+                .then((userSnapshot) => {
+                  const userSnapshotData = userSnapshot.val()
+                  dispatch(setStoredUsers({
+                    newUsers: {
+                      userSnapshotData
+                    }
+                  }))
+                })
+
+              refs.push(userRef)
+            })
 
             chatsData[chatSnapshot.key] = data;
           }
