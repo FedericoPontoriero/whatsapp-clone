@@ -13,7 +13,7 @@ const userSlice = createSlice({
 
       const usersArray = Object.values(newUsers)
       for (let i = 0; i < usersArray.length; i++) {
-        const userData = usersArray[i]
+        const userData: any = usersArray[i]
         existingUsers[userData.userId] = userData
       }
 

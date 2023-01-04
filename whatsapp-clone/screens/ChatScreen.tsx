@@ -1,23 +1,49 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { View, StyleSheet, ImageBackground, ImageSourcePropType, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons'
-
-import colors from '../constants/colors';
 import { RouteProp } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+import { NavigationScreenProp } from 'react-navigation';
+
+import colors from '../constants/colors';
 import { RootState } from '../store/store';
+import PageContainer from '../components/PageContainer';
+import Bubble from '../components/Bubble';
+
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
 interface ChatScreenProps {
-    route: RouteProp<{ params: { newChatData: string } }>
+    route: RouteProp<{ params: { newChatData: string, chatId: string } }>
+    navigation: NavigationScreenProp<any, any>
 }
 const ChatScreen = (props: ChatScreenProps) => {
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
+    const userData: any = useSelector<RootState>(state => state.auth.userData)
 
+    const [chatUsers, setChatUsers] = useState([])
     const [messageText, setMessageText] = useState("")
+    const [chatId, setChatId] = useState(props.route?.params?.chatId)
 
-    const chatData = props.route?.params?.newChatData
+    const chatData: any = props.route?.params?.newChatData
+
+    const getChatTitleFromName = () => {
+        const otherUserId = chatUsers.find(uid => uid !== userData.userId)
+        const otherUserData = storedUsers[otherUserId]
+
+        return otherUserData && `${otherUserData.firstName} ${otherUserData.lastName}`
+    }
+
+    useEffect(() => {
+        props.navigation.setParams({
+            headerTitle: getChatTitleFromName()
+        })
+        setChatUsers(chatData.users)
+    }, [chatUsers])
+
+    useEffect(() => {
+        setChatUsers(chatData.users)
+    }, [chatUsers])
 
     const sendMessage = useCallback(() => {
         setMessageText("")
@@ -27,7 +53,11 @@ const ChatScreen = (props: ChatScreenProps) => {
         <SafeAreaView edges={['right', 'left', 'bottom']} style={styles.container}>
             <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={100}>
                 <ImageBackground style={styles.backgroundImage} source={backgroundImage}>
-
+                    <PageContainer style={{ backgroundColor: 'transparent' }}>
+                        {
+                            !chatId && <Bubble types='system' text='This is a new chat. Say hi!' />
+                        }
+                    </PageContainer>
                 </ImageBackground>
 
                 <View style={styles.inputContainer}>
