@@ -9,10 +9,11 @@ import ChatListScreen from "../screens/ChatListScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { getFirebaseApp } from "../utils/firebaseHelper";
 import { child, getDatabase, off, onValue, ref } from "firebase/database";
+import { setChatsData } from "../store/chatSlice";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,6 +89,8 @@ const StackNavigator = () => {
 }
 
 const MainNavigator = (props: MainNavigatorProps) => {
+  const dispatch = useDispatch()
+
   const userData: any = useSelector<RootState>(state => state.auth.userData)
   const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
@@ -95,11 +98,35 @@ const MainNavigator = (props: MainNavigatorProps) => {
     const app = getFirebaseApp()
     const dbRef = ref(getDatabase(app))
     const userChatsRef = child(dbRef, `userChats/${userData.userId}`)
-    const refs = [userChatsRef,]
+    const refs: any = [userChatsRef,]
 
     onValue(userChatsRef, (querySnapshot) => {
       const chatIdsData = querySnapshot.val() || {}
-      const chatids = Object.values(chatIdsData)
+      const chatIds = Object.values(chatIdsData)
+
+      const chatsData = {}
+      let chatsFoundCount = 0
+
+      for (let i = 0; i < chatIds.length; ++i) {
+        const chatId = chatIds[i]
+        const chatRef = child(dbRef, `chats/${chatId}`)
+        refs.push(chatRef)
+
+        onValue(chatRef, (chatSnapshot) => {
+          chatsFoundCount++
+          const data = chatSnapshot.val()
+
+          if (data) {
+            data.key = chatSnapshot.key
+
+            chatsData[chatSnapshot.key] = data;
+          }
+
+          if (chatsFoundCount >= chatIds.length) {
+            dispatch(setChatsData({ chatsData }))
+          }
+        })
+      }
     })
 
     return () => {
