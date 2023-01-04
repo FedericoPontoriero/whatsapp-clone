@@ -11,7 +11,6 @@ import { RootState } from '../store/store';
 import PageContainer from '../components/PageContainer';
 import Bubble from '../components/Bubble';
 import { createChat } from '../utils/actions/chatActions';
-import { async } from 'validate.js';
 
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
@@ -22,12 +21,13 @@ interface ChatScreenProps {
 const ChatScreen = (props: ChatScreenProps) => {
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
     const userData: any = useSelector<RootState>(state => state.auth.userData)
+    const storedChats = useSelector<RootState>(state => state.chats.chatsData)
 
     const [chatUsers, setChatUsers] = useState([])
     const [messageText, setMessageText] = useState("")
     const [chatId, setChatId] = useState(props.route?.params?.chatId)
 
-    const chatData: any = props.route?.params?.newChatData
+    const chatData: any = (chatId && storedChats[chatId]) || props.route?.params?.newChatData
 
     const getChatTitleFromName = () => {
         const otherUserId = chatUsers.find(uid => uid !== userData.userId)
