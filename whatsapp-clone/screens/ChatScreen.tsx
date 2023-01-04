@@ -10,6 +10,8 @@ import colors from '../constants/colors';
 import { RootState } from '../store/store';
 import PageContainer from '../components/PageContainer';
 import Bubble from '../components/Bubble';
+import { createChat } from '../utils/actions/chatActions';
+import { async } from 'validate.js';
 
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
@@ -45,9 +47,19 @@ const ChatScreen = (props: ChatScreenProps) => {
         setChatUsers(chatData.users)
     }, [chatUsers])
 
-    const sendMessage = useCallback(() => {
+    const sendMessage = useCallback(async () => {
+        try {
+            let id = chatId
+            if (!id) {
+                // No chat id. Create it
+                id = await createChat(userData.userId, props.route.params.newChatData)
+                setChatId(id)
+            }
+        } catch (err) {
+            console.log(err);
+        }
         setMessageText("")
-    }, [messageText])
+    }, [messageText, chatId])
 
     return (
         <SafeAreaView edges={['right', 'left', 'bottom']} style={styles.container}>

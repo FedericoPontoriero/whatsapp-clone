@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainerProps } from "@react-navigation/native";
@@ -9,6 +9,10 @@ import ChatListScreen from "../screens/ChatListScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { getFirebaseApp } from "../utils/firebaseHelper";
+import { child, getDatabase, onValue, ref } from "firebase/database";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -44,7 +48,7 @@ const TabNavigator = () => {
   );
 };
 
-const MainNavigator = (props: MainNavigatorProps) => {
+const StackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Group>
@@ -80,6 +84,26 @@ const MainNavigator = (props: MainNavigatorProps) => {
         />
       </Stack.Group>
     </Stack.Navigator>
+  )
+}
+
+const MainNavigator = (props: MainNavigatorProps) => {
+  const userData: any = useSelector<RootState>(state => state.auth.userData)
+  const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
+
+  useEffect(() => {
+    const app = getFirebaseApp()
+    const dbRef = ref(getDatabase(app))
+    const userChatsRef = child(dbRef, `userChats/${userData.userId}`)
+
+    onValue(userChatsRef, (querySnapshot) => {
+      const chatIdsData = querySnapshot.val() || {}
+      const chatids = Object.values(chatIdsData)
+    })
+  }, [])
+
+  return (
+    <StackNavigator />
   );
 };
 
