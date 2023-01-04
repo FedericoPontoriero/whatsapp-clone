@@ -17,6 +17,7 @@ const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
     const selectedUser = props.route?.params?.selectedUserId
 
     const userData: any = useSelector<RootState>(state => state.auth.userData)
+    const userChats: any = useSelector<RootState>(state => state.chats.chatsData)
 
     useEffect(() => {
         props.navigation.setParams({

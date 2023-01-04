@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainerProps } from "@react-navigation/native";
@@ -14,6 +14,9 @@ import { RootState } from "../store/store";
 import { getFirebaseApp } from "../utils/firebaseHelper";
 import { child, getDatabase, off, onValue, ref } from "firebase/database";
 import { setChatsData } from "../store/chatSlice";
+import { ActivityIndicator, View } from "react-native";
+import colors from "../constants/colors";
+import commonStyles from "../constants/commonStyles";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -91,6 +94,8 @@ const StackNavigator = () => {
 const MainNavigator = (props: MainNavigatorProps) => {
   const dispatch = useDispatch()
 
+  const [isLoading, setIsLoading] = useState(true)
+
   const userData: any = useSelector<RootState>(state => state.auth.userData)
   const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
@@ -124,8 +129,13 @@ const MainNavigator = (props: MainNavigatorProps) => {
 
           if (chatsFoundCount >= chatIds.length) {
             dispatch(setChatsData({ chatsData }))
+            setIsLoading(false)
           }
         })
+
+        if (chatsFoundCount === 0) {
+          setIsLoading(false)
+        }
       }
     })
 
@@ -133,6 +143,12 @@ const MainNavigator = (props: MainNavigatorProps) => {
       refs.forEach(ref => off(refs))
     }
   }, [])
+
+  if (isLoading) {
+    <View style={commonStyles.center}>
+      <ActivityIndicator size={'large'} color={colors.primary} />
+    </View>
+  }
 
   return (
     <StackNavigator />
