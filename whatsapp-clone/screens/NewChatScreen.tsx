@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator, TextInput, FlatList } from 'react-native'
 import { NavigationScreenProp } from 'react-navigation'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import CustomHeaderButton from '../components/CustomHeaderButton'
 import DataItem from '../components/DataItem'
@@ -11,6 +11,7 @@ import PageContainer from '../components/PageContainer'
 import colors from '../constants/colors'
 import commonStyles from '../constants/commonStyles'
 import { RootState } from '../store/store'
+import { setStoredUsers } from '../store/userSlice'
 import { searchUsers } from '../utils/actions/userActions'
 
 interface ChatListScreenProps {
@@ -18,6 +19,8 @@ interface ChatListScreenProps {
 }
 
 const NewChatScreen = (props: ChatListScreenProps) => {
+  const dispatch = useDispatch()
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [users, setUsers] = useState<any>()
   const [noResultsFound, setNoResultsFound] = useState<boolean>(false)
@@ -51,7 +54,10 @@ const NewChatScreen = (props: ChatListScreenProps) => {
       setUsers(usersResult)
 
       if (Object.keys(usersResult).length === 0) setNoResultsFound(true)
-      else setNoResultsFound(false)
+      else {
+        setNoResultsFound(false)
+        dispatch(setStoredUsers({ newUsers: usersResult }))
+      }
 
       setIsLoading(false)
 

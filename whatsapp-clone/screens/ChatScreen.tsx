@@ -10,7 +10,7 @@ import colors from '../constants/colors';
 import { RootState } from '../store/store';
 import PageContainer from '../components/PageContainer';
 import Bubble from '../components/Bubble';
-import { createChat } from '../utils/actions/chatActions';
+import { createChat, sendTextMessage } from '../utils/actions/chatActions';
 
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
@@ -55,6 +55,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                 id = await createChat(userData.userId, props.route.params.newChatData)
                 setChatId(id)
             }
+            await sendTextMessage(chatId, userData.userId, messageText)
         } catch (err) {
             console.log(err);
         }
