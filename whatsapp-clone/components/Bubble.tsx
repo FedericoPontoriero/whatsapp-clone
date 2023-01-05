@@ -1,5 +1,7 @@
-import React from 'react'
-import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
+import React, { useRef } from 'react'
+import { StyleProp, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native'
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
+import uuid from 'react-native-uuid'
 
 import colors from '../constants/colors'
 
@@ -14,6 +16,11 @@ const Bubble = (props: BubbleProps) => {
   const bubbleStyle: StyleProp<ViewStyle> = { ...styles.container }
   const wrapperStyle: StyleProp<ViewStyle> = { ...styles.wrapperStyle }
   const textStyle: StyleProp<TextStyle> = { ...styles.text }
+
+  const menuRef = useRef(null)
+  const id = useRef(uuid.v4())
+
+  let Container: any = View
 
   switch (types) {
     case "system":
@@ -33,6 +40,13 @@ const Bubble = (props: BubbleProps) => {
       wrapperStyle.justifyContent = 'flex-end'
       bubbleStyle.backgroundColor = '#E7FED6'
       bubbleStyle.maxWidth = '90%'
+      Container = TouchableWithoutFeedback
+      break
+
+    case "theirMessage":
+      wrapperStyle.justifyContent = 'flex-start'
+      bubbleStyle.maxWidth = '90%'
+      Container = TouchableWithoutFeedback
       break
 
     default:
@@ -41,9 +55,19 @@ const Bubble = (props: BubbleProps) => {
 
   return (
     <View style={wrapperStyle}>
-      <View style={bubbleStyle}>
-        <Text style={textStyle}>{text}</Text>
-      </View>
+      <Container style={{ width: '100%' }} onLongPress={() => { menuRef.current.props.ctx.menuActions.openMenu(id.current) }}>
+        <View style={bubbleStyle}>
+          <Text style={textStyle}>{text}</Text>
+          <Menu ref={menuRef} name={String(id.current)}>
+            <MenuTrigger />
+            <MenuOptions>
+              <MenuOption text='Option 1' />
+              <MenuOption text='Option 2' />
+              <MenuOption text='Option 3' />
+            </MenuOptions>
+          </Menu>
+        </View>
+      </Container>
     </View>
   )
 }

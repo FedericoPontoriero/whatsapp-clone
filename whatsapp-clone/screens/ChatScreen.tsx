@@ -27,7 +27,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
     const userData: any = useSelector<RootState>(state => state.auth.userData)
     const storedChats = useSelector<RootState>(state => state.chats.chatsData)
-    const chatMessages = useSelector<RootState>(state => {
+    const chatMessages: any = useSelector<RootState>(state => {
         if (!chatId) return [];
         const chatMessagesData = state.messages.messagesData[chatId]
 
