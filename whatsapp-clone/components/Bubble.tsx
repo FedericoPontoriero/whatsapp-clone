@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native'
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import uuid from 'react-native-uuid'
+import * as Clipboard from 'expo-clipboard'
 
 import colors from '../constants/colors'
 
@@ -53,6 +54,14 @@ const Bubble = (props: BubbleProps) => {
       break
   }
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await Clipboard.setStringAsync(text)
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <View style={wrapperStyle}>
       <Container style={{ width: '100%' }} onLongPress={() => { menuRef.current.props.ctx.menuActions.openMenu(id.current) }}>
@@ -61,7 +70,7 @@ const Bubble = (props: BubbleProps) => {
           <Menu ref={menuRef} name={String(id.current)}>
             <MenuTrigger />
             <MenuOptions>
-              <MenuOption text='Option 1' />
+              <MenuOption text='Copy to clipboard' onSelect={() => copyToClipboard(text)} />
               <MenuOption text='Option 2' />
               <MenuOption text='Option 3' />
             </MenuOptions>
