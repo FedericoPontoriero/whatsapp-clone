@@ -5,13 +5,14 @@ import colors from '../constants/colors'
 
 interface BubbleProps {
   text: string
-  types: "system"
+  types: "system" | "error" | "myMessage" | "theirMessage" | string
 }
 
 const Bubble = (props: BubbleProps) => {
   const { text, types } = props;
 
   const bubbleStyle: StyleProp<ViewStyle> = { ...styles.container }
+  const wrapperStyle: StyleProp<ViewStyle> = { ...styles.wrapperStyle }
   const textStyle: StyleProp<TextStyle> = { ...styles.text }
 
   switch (types) {
@@ -22,14 +23,26 @@ const Bubble = (props: BubbleProps) => {
       bubbleStyle.marginTop = 10
       break
 
+    case "error":
+      bubbleStyle.backgroundColor = colors.red
+      textStyle.color = "white"
+      bubbleStyle.marginTop = 10
+      break
+
+    case "myMessage":
+      wrapperStyle.justifyContent = 'flex-end'
+      bubbleStyle.backgroundColor = '#E7FED6'
+      bubbleStyle.maxWidth = '90%'
+      break
+
     default:
       break
   }
 
   return (
-    <View style={styles.wrapperStyle}>
-      <View style={styles.container}>
-        <Text style={styles.text}>{text}</Text>
+    <View style={wrapperStyle}>
+      <View style={bubbleStyle}>
+        <Text style={textStyle}>{text}</Text>
       </View>
     </View>
   )
