@@ -5,10 +5,25 @@ import uuid from 'react-native-uuid'
 import * as Clipboard from 'expo-clipboard'
 
 import colors from '../constants/colors'
+import { Feather, FontAwesome } from '@expo/vector-icons'
 
 interface BubbleProps {
   text: string
   types: "system" | "error" | "myMessage" | "theirMessage" | string
+}
+
+
+const MenuItem = (props) => {
+  const Icon = props.iconPack ?? Feather
+
+  return <MenuOption onSelect={props.onSelect}>
+    <View style={styles.menuItemContainer}>
+      <Text style={styles.menuText}>
+        {props.text}
+      </Text>
+      <Icon name={props.icon} size={18} />
+    </View>
+  </MenuOption>
 }
 
 const Bubble = (props: BubbleProps) => {
@@ -70,9 +85,8 @@ const Bubble = (props: BubbleProps) => {
           <Menu ref={menuRef} name={String(id.current)}>
             <MenuTrigger />
             <MenuOptions>
-              <MenuOption text='Copy to clipboard' onSelect={() => copyToClipboard(text)} />
-              <MenuOption text='Option 2' />
-              <MenuOption text='Option 3' />
+              <MenuItem text='Copy to clipboard' onSelect={() => copyToClipboard(text)} icon={'copy'} />
+              <MenuItem text='Star message' onSelect={() => copyToClipboard(text)} icon={'star-o'} iconPack={FontAwesome} />
             </MenuOptions>
           </Menu>
         </View>
@@ -97,6 +111,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: '#E2DACC',
     borderWidth: 1,
+  },
+  menuItemContainer: {
+    flexDirection: 'row',
+    padding: 5,
+  },
+  menuText: {
+    flex: 1,
+    fontFamily: 'regular',
+    letterSpacing: 0.3,
+    fontSize: 16,
   },
 })
 
