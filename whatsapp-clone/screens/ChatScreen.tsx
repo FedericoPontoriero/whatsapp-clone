@@ -107,6 +107,9 @@ const ChatScreen = (props: ChatScreenProps) => {
                                     return <Bubble
                                         types={messageType}
                                         text={message.text}
+                                        messageId={message.key}
+                                        userId={userData.userId}
+                                        chatId={chatId}
                                     />
                                 }}
                             />

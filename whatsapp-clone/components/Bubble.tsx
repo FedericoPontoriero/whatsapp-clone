@@ -6,10 +6,14 @@ import * as Clipboard from 'expo-clipboard'
 
 import colors from '../constants/colors'
 import { Feather, FontAwesome } from '@expo/vector-icons'
+import { starMessage } from '../utils/actions/chatActions'
 
 interface BubbleProps {
   text: string
   types: "system" | "error" | "myMessage" | "theirMessage" | string
+  messageId?: string
+  userId?: string
+  chatId?: string
 }
 
 
@@ -27,7 +31,7 @@ const MenuItem = (props) => {
 }
 
 const Bubble = (props: BubbleProps) => {
-  const { text, types } = props;
+  const { text, types, messageId, userId, chatId } = props;
 
   const bubbleStyle: StyleProp<ViewStyle> = { ...styles.container }
   const wrapperStyle: StyleProp<ViewStyle> = { ...styles.wrapperStyle }
@@ -86,7 +90,7 @@ const Bubble = (props: BubbleProps) => {
             <MenuTrigger />
             <MenuOptions>
               <MenuItem text='Copy to clipboard' onSelect={() => copyToClipboard(text)} icon={'copy'} />
-              <MenuItem text='Star message' onSelect={() => copyToClipboard(text)} icon={'star-o'} iconPack={FontAwesome} />
+              <MenuItem text='Star message' onSelect={() => starMessage(messageId, chatId, userId)} icon={'star-o'} iconPack={FontAwesome} />
             </MenuOptions>
           </Menu>
         </View>
