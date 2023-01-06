@@ -16,8 +16,20 @@ interface BubbleProps {
   messageId?: string
   userId?: string
   chatId?: string
+  date?: string
 }
 
+function formatAmPm(dateString: string) {
+  const date = new Date(dateString)
+  let hours = date.getHours()
+  let minutes: string | number = date.getMinutes()
+  const ampm = hours <= 12 ? 'pm' : 'am'
+  hours = hours % 12
+  hours = hours ? hours : 12
+  minutes = minutes < 10 ? '0' + minutes : minutes
+  const strTime = hours + ':' + minutes + ' ' + ampm
+  return strTime
+}
 
 const MenuItem = (props) => {
   const Icon = props.iconPack ?? Feather
@@ -33,7 +45,7 @@ const MenuItem = (props) => {
 }
 
 const Bubble = (props: BubbleProps) => {
-  const { text, types, messageId, userId, chatId } = props;
+  const { text, types, messageId, userId, chatId, date } = props;
 
   const starredMessages = useSelector<RootState>(state => state.messages.starredMessages[chatId] ?? {})
 
@@ -45,6 +57,8 @@ const Bubble = (props: BubbleProps) => {
   const id = useRef(uuid.v4())
 
   let Container: any = View
+  let isUserMessage = false
+  const dateString = formatAmPm(date)
 
   switch (types) {
     case "system":
@@ -65,12 +79,14 @@ const Bubble = (props: BubbleProps) => {
       bubbleStyle.backgroundColor = '#E7FED6'
       bubbleStyle.maxWidth = '90%'
       Container = TouchableWithoutFeedback
+      isUserMessage = true
       break
 
     case "theirMessage":
       wrapperStyle.justifyContent = 'flex-start'
       bubbleStyle.maxWidth = '90%'
       Container = TouchableWithoutFeedback
+      isUserMessage = true
       break
 
     default:
@@ -85,16 +101,26 @@ const Bubble = (props: BubbleProps) => {
     }
   }
 
+  const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+
   return (
     <View style={wrapperStyle}>
       <Container style={{ width: '100%' }} onLongPress={() => { menuRef.current.props.ctx.menuActions.openMenu(id.current) }}>
         <View style={bubbleStyle}>
           <Text style={textStyle}>{text}</Text>
+
+          {
+            dateString && <View style={styles.timeContainer}>
+              {isStarred && <FontAwesome style={{ marginRight: 5 }} name='star' size={14} color={colors.textColor} />}
+              <Text style={styles.time}>{dateString}</Text>
+            </View>
+          }
+
           <Menu ref={menuRef} name={String(id.current)}>
             <MenuTrigger />
             <MenuOptions>
               <MenuItem text='Copy to clipboard' onSelect={() => copyToClipboard(text)} icon={'copy'} />
-              <MenuItem text='Star message' onSelect={() => starMessage(messageId, chatId, userId)} icon={'star-o'} iconPack={FontAwesome} />
+              <MenuItem text={`${isStarred ? 'Unstar' : 'Star'} message`} onSelect={() => starMessage(messageId, chatId, userId)} icon={isStarred ? 'star' : 'star-o'} iconPack={FontAwesome} />
             </MenuOptions>
           </Menu>
         </View>
@@ -129,6 +155,16 @@ const styles = StyleSheet.create({
     fontFamily: 'regular',
     letterSpacing: 0.3,
     fontSize: 16,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  time: {
+    fontFamily: 'regular',
+    letterSpacing: 0.3,
+    color: colors.grey,
+    fontSize: 12,
   },
 })
 

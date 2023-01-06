@@ -110,6 +110,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                                         messageId={message.key}
                                         userId={userData.userId}
                                         chatId={chatId}
+                                        date={message.sentAt}
                                     />
                                 }}
                             />
