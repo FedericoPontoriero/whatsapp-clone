@@ -75,8 +75,9 @@ const ChatScreen = (props: ChatScreenProps) => {
                 id = await createChat(userData.userId, props.route.params.newChatData)
                 setChatId(id)
             }
-            await sendTextMessage(chatId, userData.userId, messageText)
+            await sendTextMessage(chatId, userData.userId, messageText, replyingTo && replyingTo.key)
             setMessageText("")
+            setReplyingTo(null)
         } catch (err) {
             console.log(err);
             setErrorBannerText("Message failed to sent")
@@ -114,6 +115,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                                         chatId={chatId}
                                         date={message.sentAt}
                                         setReply={() => setReplyingTo(message)}
+                                        replyingTo={message.replyTo && chatMessages.find(i => i.key === message.replyTo)}
                                     />
                                 }}
                             />
@@ -124,7 +126,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                         replyingTo && <ReplyTo
                             text={replyingTo.text}
                             user={storedUsers[replyingTo.sentBy]}
-                            onCancel={() => { }}
+                            onCancel={() => setReplyingTo(null)}
                         />
                     }
 

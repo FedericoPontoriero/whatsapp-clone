@@ -12,12 +12,14 @@ import { RootState } from '../store/store'
 
 interface BubbleProps {
   text: string
-  types: "system" | "error" | "myMessage" | "theirMessage" | string
+  types: "system" | "error" | "myMessage" | "theirMessage" | 'reply' | string
   messageId?: string
   userId?: string
   chatId?: string
   date?: string
   setReply?: () => void
+  replyingTo?: any
+  name?: string
 }
 
 function formatAmPm(dateString: string) {
@@ -46,7 +48,9 @@ const MenuItem = (props) => {
 }
 
 const Bubble = (props: BubbleProps) => {
-  const { text, types, messageId, userId, chatId, date, setReply } = props;
+  const { text, types, messageId, userId, chatId, date, setReply, replyingTo, name } = props;
+
+  const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
   const starredMessages = useSelector<RootState>(state => state.messages.starredMessages[chatId] ?? {})
 
@@ -59,7 +63,7 @@ const Bubble = (props: BubbleProps) => {
 
   let Container: any = View
   let isUserMessage = false
-  const dateString = formatAmPm(date)
+  const dateString = date && formatAmPm(date)
 
   switch (types) {
     case "system":
@@ -90,6 +94,10 @@ const Bubble = (props: BubbleProps) => {
       isUserMessage = true
       break
 
+    case "reply":
+      bubbleStyle.backgroundColor = '#f2f2f2'
+      break
+
     default:
       break
   }
@@ -103,11 +111,23 @@ const Bubble = (props: BubbleProps) => {
   }
 
   const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+  const replyingToUser = replyingTo && storedUsers[replyingTo.sendBy]
 
   return (
     <View style={wrapperStyle}>
       <Container style={{ width: '100%' }} onLongPress={() => { menuRef.current.props.ctx.menuActions.openMenu(id.current) }}>
         <View style={bubbleStyle}>
+          {
+            name &&
+            <Text style={styles.name}>{name}</Text>
+          }
+          {
+            replyingToUser &&
+            <Bubble
+              types='reply'
+              text={replyingTo}
+              name={`${replyingToUser.firstName} ${replyingToUser.lastName}`} />
+          }
           <Text style={textStyle}>{text}</Text>
 
           {
@@ -167,6 +187,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     color: colors.grey,
     fontSize: 12,
+  },
+  name: {
+    fontFamily: 'medium',
+    letterSpacing: 0.3,
   },
 })
 
