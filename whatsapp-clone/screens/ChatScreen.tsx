@@ -11,6 +11,7 @@ import { RootState } from '../store/store';
 import PageContainer from '../components/PageContainer';
 import Bubble from '../components/Bubble';
 import { createChat, sendTextMessage } from '../utils/actions/chatActions';
+import ReplyTo from '../components/ReplyTo';
 
 const backgroundImage: ImageSourcePropType = require("../assets/droplet.jpg");
 
@@ -23,7 +24,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     const [messageText, setMessageText] = useState("")
     const [chatId, setChatId] = useState(props.route?.params?.chatId)
     const [errorBannerText, setErrorBannerText] = useState("")
-    const [replyingTo, setReplyingTo] = useState()
+    const [replyingTo, setReplyingTo] = useState<any>()
 
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
     const userData: any = useSelector<RootState>(state => state.auth.userData)
@@ -120,7 +121,11 @@ const ChatScreen = (props: ChatScreenProps) => {
                     </PageContainer>
 
                     {
-                        replyingTo && <Text>Replying</Text>
+                        replyingTo && <ReplyTo
+                            text={replyingTo.text}
+                            user={storedUsers[replyingTo.sentBy]}
+                            onCancel={() => { }}
+                        />
                     }
 
                 </ImageBackground>
