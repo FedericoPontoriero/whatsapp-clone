@@ -7,6 +7,8 @@ import * as Clipboard from 'expo-clipboard'
 import colors from '../constants/colors'
 import { Feather, FontAwesome } from '@expo/vector-icons'
 import { starMessage } from '../utils/actions/chatActions'
+import { useSelector } from 'react-redux'
+import { RootState } from '../store/store'
 
 interface BubbleProps {
   text: string
@@ -32,6 +34,8 @@ const MenuItem = (props) => {
 
 const Bubble = (props: BubbleProps) => {
   const { text, types, messageId, userId, chatId } = props;
+
+  const starredMessages = useSelector<RootState>(state => state.messages.starredMessages[chatId] ?? {})
 
   const bubbleStyle: StyleProp<ViewStyle> = { ...styles.container }
   const wrapperStyle: StyleProp<ViewStyle> = { ...styles.wrapperStyle }
