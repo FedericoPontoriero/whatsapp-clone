@@ -17,6 +17,7 @@ interface BubbleProps {
   userId?: string
   chatId?: string
   date?: string
+  setReply?: () => void
 }
 
 function formatAmPm(dateString: string) {
@@ -45,7 +46,7 @@ const MenuItem = (props) => {
 }
 
 const Bubble = (props: BubbleProps) => {
-  const { text, types, messageId, userId, chatId, date } = props;
+  const { text, types, messageId, userId, chatId, date, setReply } = props;
 
   const starredMessages = useSelector<RootState>(state => state.messages.starredMessages[chatId] ?? {})
 
@@ -121,6 +122,7 @@ const Bubble = (props: BubbleProps) => {
             <MenuOptions>
               <MenuItem text='Copy to clipboard' onSelect={() => copyToClipboard(text)} icon={'copy'} />
               <MenuItem text={`${isStarred ? 'Unstar' : 'Star'} message`} onSelect={() => starMessage(messageId, chatId, userId)} icon={isStarred ? 'star' : 'star-o'} iconPack={FontAwesome} />
+              <MenuItem text='Reply' icon='arrow-left-circle' onSelect={setReply} />
             </MenuOptions>
           </Menu>
         </View>
