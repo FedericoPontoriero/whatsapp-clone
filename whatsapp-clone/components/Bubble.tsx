@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { StyleProp, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native'
+import { Image, StyleProp, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native'
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import uuid from 'react-native-uuid'
 import * as Clipboard from 'expo-clipboard'
@@ -20,6 +20,7 @@ interface BubbleProps {
   setReply?: () => void
   replyingTo?: any
   name?: string
+  imageUrl?: string
 }
 
 function formatAmPm(dateString: string) {
@@ -48,7 +49,7 @@ const MenuItem = (props) => {
 }
 
 const Bubble = (props: BubbleProps) => {
-  const { text, types, messageId, userId, chatId, date, setReply, replyingTo, name } = props;
+  const { text, types, messageId, userId, chatId, date, setReply, replyingTo, name, imageUrl } = props;
 
   const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
@@ -121,6 +122,7 @@ const Bubble = (props: BubbleProps) => {
             name &&
             <Text style={styles.name}>{name}</Text>
           }
+
           {
             replyingToUser &&
             <Bubble
@@ -128,7 +130,16 @@ const Bubble = (props: BubbleProps) => {
               text={replyingTo}
               name={`${replyingToUser.firstName} ${replyingToUser.lastName}`} />
           }
-          <Text style={textStyle}>{text}</Text>
+
+          {
+            !imageUrl &&
+            <Text style={textStyle}>{text}</Text>
+          }
+
+          {
+            imageUrl &&
+            <Image source={{ uri: imageUrl }} style={styles.image} />
+          }
 
           {
             dateString && <View style={styles.timeContainer}>
@@ -191,6 +202,11 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'medium',
     letterSpacing: 0.3,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    marginBottom: 5,
   },
 })
 
