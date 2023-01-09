@@ -1,6 +1,6 @@
 import { RouteProp } from '@react-navigation/native'
 import React, { useEffect } from 'react'
-import { View, Text, StyleSheet, Button, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Button, FlatList, TouchableOpacity } from 'react-native'
 import { NavigationScreenProp } from 'react-navigation'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { useSelector } from 'react-redux'
@@ -8,16 +8,20 @@ import CustomHeaderButton from '../components/CustomHeaderButton'
 import DataItem from '../components/DataItem'
 import PageContainer from '../components/PageContainer'
 import { PageTitle } from '../components/PageTitle'
+import colors from '../constants/colors'
 import { RootState } from '../store/store'
 
 interface ChatListScreenProps {
     navigation: NavigationScreenProp<any, any>
-    route: RouteProp<{ params: { selectedUserId: string } }>
+    route: RouteProp<{ params: { selectedUserId: string, selectedUsers: string[], chatName: string } }>
 }
 
 const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
 
     const selectedUser = props.route?.params?.selectedUserId
+    const selectedUserList = props.route?.params?.selectedUsers
+    const chatName = props.route?.params?.chatName
+
 
     const userData: any = useSelector<RootState>(state => state.auth.userData)
     const storedUsers: any = useSelector<RootState>(state => state.users.storedUsers)
@@ -41,31 +45,68 @@ const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
     }, [])
 
     useEffect(() => {
-        if (!selectedUser) return
+        if (!selectedUser && !selectedUserList) return
 
-        const chatUsers = [selectedUser, userData.userId]
-        const navigationProps = {
-            newChatData: { users: chatUsers }
+        let chatData
+        let navigationProps
+
+        if (selectedUser) {
+            chatData = userChats.find(cid => !cid.isGroupChat && cid.users.includes(selectedUser))
         }
+
+        if (chatData) {
+            navigationProps = { chatid: chatData.key }
+        } else {
+            const chatUsers = selectedUserList || [selectedUser]
+            if (!chatUsers.includes(userData.userId)) {
+                chatUsers.push(userData.userId)
+            }
+
+            navigationProps = {
+                newChatData: {
+                    users: chatUsers,
+                    isGroupChat: selectedUserList !== undefined,
+                    chatName,
+                }
+            }
+        }
+
         props.navigation.navigate("ChatScreen", navigationProps)
     }, [props.route?.params])
 
     return <PageContainer>
         <PageTitle text='Chats' />
+
+        <View>
+            <TouchableOpacity
+                onPress={() => props.navigation.navigate("NewChat", { isGroupChat: true })}
+            >
+                <Text style={styles.newGroupText}>New Group</Text>
+            </TouchableOpacity>
+        </View>
+
         <FlatList
             data={userChats}
             renderItem={(itemData) => {
                 const chatData = itemData.item
                 const chatId = chatData.key
+                const isGroupChat = chatData.isGroupChat
 
-                const otherUserId = chatData.users.find((uid) => uid !== userData.userId)
-                const otherUser = storedUsers[otherUserId]
-
-                if (!otherUser) return
-
-                const title = `${otherUser.firstName} ${otherUser.lastName}`
+                let title = ""
                 const subTitle = chatData.latestMessageText || "New chat"
-                const image = otherUser.profilePicture
+                let image = ""
+
+                if (isGroupChat) {
+                    title = chatData.chatName
+                } else {
+                    const otherUserId = chatData.users.find((uid) => uid !== userData.userId)
+                    const otherUser = storedUsers[otherUserId]
+
+                    if (!otherUser) return
+
+                    title = `${otherUser.firstName} ${otherUser.lastName}`
+                    image = otherUser.profilePicture
+                }
 
                 return <DataItem
                     title={title}
@@ -83,7 +124,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
+    newGroupText: {
+        color: colors.blue,
+        fontSize: 17,
+        marginBottom: 5,
+    },
 });
 
 export default ChatListScreen;

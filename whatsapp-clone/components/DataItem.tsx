@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacityProps, TouchableWithoutFeedback, View } from 'react-native'
 import colors from '../constants/colors'
@@ -7,10 +8,13 @@ interface DataItemProps extends TouchableOpacityProps {
   title: string
   subTitle: string
   image: string
+  type?: string
+  isChecked?: boolean
+  onPress?: () => void
 }
 
 const DataItem = (props: DataItemProps) => {
-  const { title, subTitle, image } = props;
+  const { title, subTitle, image, type, isChecked } = props;
 
   return (
     <TouchableWithoutFeedback onPress={props.onPress}>
@@ -32,6 +36,14 @@ const DataItem = (props: DataItemProps) => {
             {subTitle}
           </Text>
         </View>
+
+        {
+          type === "checkbox" &&
+          <View style={{ ...styles.iconContainer, ...isChecked && styles.checkedStyle }}>
+            <Ionicons name="checkmark" size={18} color="white" />
+          </View>
+        }
+
       </View>
     </TouchableWithoutFeedback>
   )
@@ -58,6 +70,16 @@ const styles = StyleSheet.create({
     fontFamily: 'regular',
     color: colors.grey,
     letterSpacing: 0.3,
+  },
+  iconContainer: {
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: colors.lightGrey,
+    backgroundColor: 'white',
+  },
+  checkedStyle: {
+    backgroundColor: colors.primary,
+    borderColor: 'transparent',
   },
 })
 
