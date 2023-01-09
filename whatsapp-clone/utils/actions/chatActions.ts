@@ -87,3 +87,15 @@ export const starMessage = async (messageId: string, chatId: string, userId: str
     console.log(err);
   }
 }
+
+export const updateChatData = async (chatId, userId, chatData) => {
+  const app = getFirebaseApp()
+  const dbRef = ref(getDatabase(app))
+  const chatRef = child(dbRef, `chats/${chatId}`)
+
+  await update(chatRef, {
+    ...chatData,
+    updatedAt: new Date().toISOString(),
+    updatedBy: userId,
+  })
+}

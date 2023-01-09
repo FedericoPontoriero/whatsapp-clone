@@ -70,8 +70,9 @@ const StackNavigator = () => {
           name="ChatSettings"
           component={ChatSettingsScreen}
           options={{
-            headerTitle: "Settings",
+            headerTitle: "",
             headerBackTitle: "Back",
+            headerShadowVisible: false,
           }}
         />
         <Stack.Screen
