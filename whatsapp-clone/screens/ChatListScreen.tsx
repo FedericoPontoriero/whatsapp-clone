@@ -98,6 +98,7 @@ const ChatListScreen: React.FC = (props: ChatListScreenProps) => {
 
                 if (isGroupChat) {
                     title = chatData.chatName
+                    image = chatData.chatImage
                 } else {
                     const otherUserId = chatData.users.find((uid) => uid !== userData.userId)
                     const otherUser = storedUsers[otherUserId]

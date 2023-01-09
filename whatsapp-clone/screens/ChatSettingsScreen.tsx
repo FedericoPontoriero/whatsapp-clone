@@ -18,8 +18,8 @@ const ChatSettingsScreen = (props) => {
                 showEditButton={true}
                 size={80}
                 chatId={chatId}
-                uri={''}
                 userId={userData.userId}
+                uri={chatData.chatImage}
             />
             <Text>{chatData.chatName}</Text>
         </ScrollView>
