@@ -159,7 +159,12 @@ const ChatScreen = (props: ChatScreenProps) => {
                                 const isOwnMessage = message.sentBy === userData.userId
 
                                 const messageType = isOwnMessage ? "myMessage" : "theirMessage"
+
+                                const sender = message.sentBy && storedUsers[message.sentBy]
+                                const name = sender && `${sender.firstName} ${sender.lastName}`
+
                                 return <Bubble
+                                    name={!chatData.isGroupChat || isOwnMessage ? undefined : name}
                                     types={messageType}
                                     text={message.text}
                                     messageId={message.key}
