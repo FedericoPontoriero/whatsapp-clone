@@ -15,6 +15,20 @@ export const getUserData = async (userId: string) => {
   }
 }
 
+
+export const getUserChats = async (userId: string) => {
+  try {
+    const app = getFirebaseApp()
+    const dbRef = ref(getDatabase(app))
+    const userRef = child(dbRef, `userChats/${userId}`)
+
+    const snapshot = await get(userRef)
+    return snapshot.val()
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 export const searchUsers = async (queryText: string) => {
   const searchTerm = queryText.toLowerCase()
   try {

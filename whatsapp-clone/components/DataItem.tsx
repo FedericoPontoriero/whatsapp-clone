@@ -7,7 +7,7 @@ import ProfileImage from './ProfileImage'
 interface DataItemProps extends TouchableOpacityProps {
   title: string
   subTitle: string
-  image: string
+  image?: string
   type?: string
   isChecked?: boolean
   onPress?: () => void
@@ -41,6 +41,13 @@ const DataItem = (props: DataItemProps) => {
           type === "checkbox" &&
           <View style={{ ...styles.iconContainer, ...isChecked && styles.checkedStyle }}>
             <Ionicons name="checkmark" size={18} color="white" />
+          </View>
+        }
+
+        {
+          type === "link" &&
+          <View>
+            <Ionicons name="chevron-forward-outline" size={18} color={colors.grey} />
           </View>
         }
 
