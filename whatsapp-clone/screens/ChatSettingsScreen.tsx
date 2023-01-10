@@ -1,6 +1,7 @@
 import React, { useCallback, useReducer, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import DataItem from '../components/DataItem'
 
 import Input from '../components/Input'
 import PageContainer from '../components/PageContainer'
@@ -17,6 +18,7 @@ const ChatSettingsScreen = (props) => {
     const chatId = props.route.params.chatId
     const chatData: any = useSelector<RootState>(state => state.chats.chatsData[chatId])
     const userData: any = useSelector<RootState>(state => state.auth.userData)
+    const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
     const [isLoading, setIsLoading] = useState(false)
     const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -84,6 +86,29 @@ const ChatSettingsScreen = (props) => {
                 onInputChanged={inputChangedHandler}
                 errorText={formState.inputValidities["chatName"]}
             />
+
+            <View style={styles.sectionContainer}>
+                <Text style={styles.heading}>{chatData.users.length} Participants</Text>
+                <DataItem
+                    title='Add users'
+                    icon="plus"
+                    type='button'
+                />
+                {
+                    chatData.users.map(uid => {
+                        const currentUser = storedUsers[uid]
+                        return <DataItem
+                            key={uid}
+                            image={currentUser.profilePicture}
+                            title={`${currentUser.firstName} ${currentUser.lastName}`}
+                            subTitle={currentUser.about}
+                            type={uid !== userData.userId && "link"}
+                            onPress={() => uid !== userData.userId && props.navigation.navigate("Contact", { uid })}
+                        />
+                    })
+                }
+            </View>
+
             {showSuccessMessage && <Text>Saved!</Text>}
 
             {
@@ -109,6 +134,16 @@ const styles = StyleSheet.create({
     scrollView: {
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    sectionContainer: {
+        width: '100%',
+        marginTop: 10,
+    },
+    heading: {
+        marginVertical: 8,
+        color: colors.textColor,
+        fontFamily: 'bold',
+        letterSpacing: 0.3,
     },
 })
 
