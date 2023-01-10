@@ -85,7 +85,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             }
         })
         setChatUsers(chatData.users)
-    }, [chatUsers])
+    }, [chatUsers, title])
 
     useEffect(() => {
         setChatUsers(chatData.users)
