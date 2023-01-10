@@ -131,6 +131,7 @@ const ChatSettingsScreen = (props) => {
                         type={'link'}
                         title="View all"
                         hideImage={true}
+                        onPress={() => props.navigation.navigate("DataList", { title: "Participants", data: chatData.users, type: "users", chatId })}
                     />
                 }
 
