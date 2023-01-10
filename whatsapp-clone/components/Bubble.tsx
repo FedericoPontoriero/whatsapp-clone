@@ -12,7 +12,7 @@ import { RootState } from '../store/store'
 
 interface BubbleProps {
   text: string
-  types: "system" | "error" | "myMessage" | "theirMessage" | 'reply' | string
+  types: "system" | "error" | "myMessage" | "theirMessage" | 'reply' | 'info' | string
   messageId?: string
   userId?: string
   chatId?: string
@@ -99,6 +99,12 @@ const Bubble = (props: BubbleProps) => {
       bubbleStyle.backgroundColor = '#f2f2f2'
       break
 
+    case "info":
+      bubbleStyle.backgroundColor = 'white'
+      bubbleStyle.alignItems = 'center'
+      textStyle.color = colors.textColor
+      break
+
     default:
       break
   }
@@ -119,7 +125,7 @@ const Bubble = (props: BubbleProps) => {
       <Container style={{ width: '100%' }} onLongPress={() => { menuRef.current.props.ctx.menuActions.openMenu(id.current) }}>
         <View style={bubbleStyle}>
           {
-            name &&
+            name && types !== 'info' &&
             <Text style={styles.name}>{name}</Text>
           }
 
@@ -142,7 +148,7 @@ const Bubble = (props: BubbleProps) => {
           }
 
           {
-            dateString && <View style={styles.timeContainer}>
+            dateString && types !== 'info' && <View style={styles.timeContainer}>
               {isStarred && <FontAwesome style={{ marginRight: 5 }} name='star' size={14} color={colors.textColor} />}
               <Text style={styles.time}>{dateString}</Text>
             </View>
