@@ -6,12 +6,13 @@ import colors from "../constants/colors"
 interface InputProps extends TextInputProps {
     label: string;
     icon?: string;
-    iconPack: any;
+    iconPack?: any;
     iconSize?: number;
     errorText?: string;
     id?: string;
     onInputChanged?: (inputId: string, inputValue: string) => void;
     initialValue?: string | null;
+    allowEmpty?: boolean
 }
 
 const Input = (props: InputProps) => {
