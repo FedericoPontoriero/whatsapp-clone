@@ -112,7 +112,7 @@ const ChatSettingsScreen = (props) => {
                     type='button'
                 />
                 {
-                    chatData.users.map(uid => {
+                    chatData.users.slice(0, 4).map(uid => {
                         const currentUser = storedUsers[uid]
                         return <DataItem
                             key={uid}
@@ -124,6 +124,16 @@ const ChatSettingsScreen = (props) => {
                         />
                     })
                 }
+
+                {
+                    chatData.users.length > 4 &&
+                    <DataItem
+                        type={'link'}
+                        title="View all"
+                        hideImage={true}
+                    />
+                }
+
             </View>
 
             {showSuccessMessage && <Text>Saved!</Text>}

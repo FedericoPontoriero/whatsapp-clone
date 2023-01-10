@@ -12,6 +12,7 @@ interface DataItemProps extends TouchableOpacityProps {
   isChecked?: boolean
   onPress?: () => void
   icon?: any
+  hideImage?: boolean
 }
 
 const imageSize = 40
@@ -19,11 +20,13 @@ const imageSize = 40
 const DataItem = (props: DataItemProps) => {
   const { title, subTitle, image, type, isChecked, icon } = props;
 
+  const hideImage = props.hideImage && props.hideImage === true;
+
   return (
     <TouchableWithoutFeedback onPress={props.onPress}>
       <View style={styles.container}>
         {
-          !icon &&
+          !icon && !hideImage &&
           <ProfileImage
             showEditButton={false}
             uri={image}
