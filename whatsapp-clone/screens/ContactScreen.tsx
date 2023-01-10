@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import DataItem from '../components/DataItem'
 import PageContainer from '../components/PageContainer'
@@ -8,17 +8,18 @@ import ProfileImage from '../components/ProfileImage'
 import SubmitButton from '../components/SubmitButton'
 import colors from '../constants/colors'
 import { RootState } from '../store/store'
+import { removeUserFromChat } from '../utils/actions/chatActions'
 import { getUserChats } from '../utils/actions/userActions'
 
 const ContactScreen = (props) => {
   const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
-  const currentUser = storedUsers[props.route.params.uid]
-
-
+  const userData = useSelector<RootState>(state => state.auth.userData)
   const storedChats = useSelector<RootState>(state => state.chats.chatsData)
 
   const [commonChats, setCommonChats] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
+  const currentUser = storedUsers[props.route.params.uid]
   const chatId = props.route.params.chatId
   const chatData = chatId && storedChats[chatId]
 
@@ -32,6 +33,20 @@ const ContactScreen = (props) => {
 
     getCommonUserChats()
   }, [])
+
+  const removeFromChat = useCallback(async () => {
+    try {
+      setIsLoading(true)
+
+      await removeUserFromChat(userData, currentUser, chatData)
+
+      props.navigation.goBack()
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false)
+    }
+  }, [props.navigation, isLoading])
 
   return <PageContainer>
     <View style={styles.topContainer}>
@@ -75,10 +90,13 @@ const ContactScreen = (props) => {
 
     {
       chatData && chatData.isGroupChat &&
-      <SubmitButton
-        title='Remove from chat'
-        color={colors.red}
-      />
+        isLoading ?
+        <ActivityIndicator size={'small'} color={colors.primary} /> :
+        <SubmitButton
+          title='Remove from chat'
+          onPress={removeFromChat}
+          color={colors.red}
+        />
     }
 
   </PageContainer>
