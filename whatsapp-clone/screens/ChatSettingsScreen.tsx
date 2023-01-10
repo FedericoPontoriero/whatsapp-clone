@@ -10,13 +10,13 @@ import ProfileImage from '../components/ProfileImage'
 import SubmitButton from '../components/SubmitButton'
 import colors from '../constants/colors'
 import { RootState } from '../store/store'
-import { updateChatData } from '../utils/actions/chatActions'
+import { removeUserFromChat, updateChatData } from '../utils/actions/chatActions'
 import { validateInput } from '../utils/actions/formActions'
 import { reducer } from '../utils/reducers/formReducer'
 
 const ChatSettingsScreen = (props) => {
     const chatId = props.route.params.chatId
-    const chatData: any = useSelector<RootState>(state => state.chats.chatsData[chatId])
+    const chatData: any = useSelector<RootState>(state => state.chats.chatsData[chatId] || {})
     const userData: any = useSelector<RootState>(state => state.auth.userData)
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
@@ -66,6 +66,23 @@ const ChatSettingsScreen = (props) => {
             currentValues.chatName !== chatData.chatName
         );
     };
+
+    const leaveChat = useCallback(async () => {
+        try {
+            setIsLoading(true)
+
+            await removeUserFromChat(userData, userData, chatData)
+
+            props.navigation.popToTop()
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false)
+        }
+    }, [props.navigation, isLoading])
+
+    if (!chatData.users) return null
+
     return <PageContainer>
         <PageTitle text='Chat Settings' />
         <ScrollView style={styles.scrollView}>
@@ -122,6 +139,15 @@ const ChatSettingsScreen = (props) => {
                     />
             }
         </ScrollView>
+
+        {
+            <SubmitButton
+                title='Leave chat'
+                color={colors.red}
+                onPress={() => leaveChat()}
+                style={{ marginBottom: 20 }}
+            />
+        }
     </PageContainer>
 }
 

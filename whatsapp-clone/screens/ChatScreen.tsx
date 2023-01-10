@@ -55,7 +55,7 @@ const ChatScreen = (props: ChatScreenProps) => {
         return messageList
     })
 
-    const chatData: any = (chatId && storedChats[chatId]) || props.route?.params?.newChatData
+    const chatData: any = (chatId && storedChats[chatId]) || props.route?.params?.newChatData || {}
 
     const getChatTitleFromName = () => {
         const otherUserId = chatUsers.find(uid => uid !== userData.userId)
@@ -64,11 +64,11 @@ const ChatScreen = (props: ChatScreenProps) => {
         return otherUserData && `${otherUserData.firstName} ${otherUserData.lastName}`
     }
 
-    const title = chatData.chatName ?? getChatTitleFromName()
-
     useEffect(() => {
+        if (!chatData) return;
+
         props.navigation.setParams({
-            headerTitle: title,
+            headerTitle: chatData.chatName ?? getChatTitleFromName(),
             headerRight: () => {
                 return <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
                     {
@@ -85,7 +85,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             }
         })
         setChatUsers(chatData.users)
-    }, [chatUsers, title])
+    }, [chatUsers])
 
     useEffect(() => {
         setChatUsers(chatData.users)
