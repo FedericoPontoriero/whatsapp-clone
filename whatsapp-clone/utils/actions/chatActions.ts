@@ -132,16 +132,27 @@ export const removeUserFromChat = async (userLoggedInData, userToRemoveData, cha
   await sendInfoMessage(chatData.key, userLoggedInData.userId, messageText)
 }
 
-export const addUsersToChat = (userLoggedInData, usersToAddData, chatData) => {
+export const addUsersToChat = async (userLoggedInData, usersToAddData, chatData) => {
   const existingUsers = Object.values(chatData.users)
   const newUsers = [];
+  let userAddedName = ''
 
-  usersToAddData.forEach(userToAdd => {
+  usersToAddData.forEach(async userToAdd => {
     const userToAddId = userToAdd.userId
 
     if (existingUsers.includes(userToAddId)) return;
 
     newUsers.push(userToAddId)
-    addUserChat(userToAddId, chatData.key)
+    await addUserChat(userToAddId, chatData.key)
+
+    userAddedName = `${userToAdd.firstName} ${userToAdd.lastName}`
   })
+
+  if (newUsers.length === 0) return;
+
+  await updateChatData(chatData.key, userLoggedInData.userId, { users: existingUsers.concat(newUsers) })
+
+  const moreUsersMessage = newUsers.length > 1 ? `and ${newUsers.length - 1} others ` : ''
+  const messageText = `${userLoggedInData.firstName} ${userLoggedInData.lastName} added ${userAddedName} ${moreUsersMessage}to the chat`
+  await sendInfoMessage(chatData.key, userLoggedInData.userId, messageText)
 }
