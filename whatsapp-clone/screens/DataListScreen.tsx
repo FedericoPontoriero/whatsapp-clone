@@ -10,6 +10,7 @@ const DataListScreen = (props) => {
 
   const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
   const userData: any = useSelector<RootState>(state => state.auth.userData)
+  const messagesData = useSelector<RootState>(state => state.messages.messagesData)
 
   useEffect(() => {
     props.navigation.setParams({ headerTitle: title })
@@ -18,7 +19,7 @@ const DataListScreen = (props) => {
   return <PageContainer>
     <FlatList
       data={data}
-      keyExtractor={item => item}
+      keyExtractor={item => item.messageId || item}
       renderItem={(itemData) => {
         let key, onPress, image, title, subTitle, itemType
 
@@ -36,6 +37,22 @@ const DataListScreen = (props) => {
           subTitle = currentUser.about
           itemType = isLoggedInUser ? undefined : 'link'
           onPress = isLoggedInUser ? undefined : () => props.navigation.navigate("Contact", { uid, chatId })
+        } else if (type === "messages") {
+          const starData = itemData.item
+          const { chatId, messageId } = starData
+          const messagesForChat = messagesData[chatId]
+
+          if (!messagesForChat) return;
+
+          const messageData = messagesForChat[messageId]
+          const sender = messageData.sentBy && storedUsers[messageData.sentBy]
+          const name = sender && `${sender.firstName} ${sender.lastName}`
+
+          key = messageId
+          title = name
+          subTitle = messageData.text
+          itemType = ''
+          onPress = () => { }
         }
 
         return <DataItem

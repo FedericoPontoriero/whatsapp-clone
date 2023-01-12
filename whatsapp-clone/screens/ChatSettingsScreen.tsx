@@ -20,6 +20,8 @@ const ChatSettingsScreen = (props) => {
     const userData: any = useSelector<RootState>(state => state.auth.userData)
     const storedUsers = useSelector<RootState>(state => state.users.storedUsers)
 
+    const starredMessages = useSelector<RootState>(state => state.messages.starredMessages[chatId] ?? {})
+
     const [isLoading, setIsLoading] = useState(false)
     const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
@@ -169,7 +171,15 @@ const ChatSettingsScreen = (props) => {
                         disabled={!formState.formIsValid}
                     />
             }
+            <DataItem
+                type={'link'}
+                title="Starred messages"
+                hideImage={true}
+                onPress={() => props.navigation.navigate("DataList", { title: "Starred messages", data: Object.values(starredMessages), type: "messages" })}
+            />
+
         </ScrollView>
+
 
         {
             <SubmitButton
