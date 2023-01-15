@@ -29,15 +29,18 @@ export const sendTextMessage = async (chatId, senderData, messageText, replyTo, 
   await sendMessage(chatId, senderData.userId, messageText, null, replyTo, null)
 
   const otherUsers = chatUsers.filter(uid => uid !== senderData.userId)
-  await sendPushNotificationForUsers(otherUsers, `${senderData.firstName} ${senderData.lastName}`, messageText)
+  await sendPushNotificationForUsers(otherUsers, `${senderData.firstName} ${senderData.lastName}`, messageText, chatId)
 }
 
 export const sendInfoMessage = async (chatId, senderId, messageText) => {
   await sendMessage(chatId, senderId, messageText, null, null, "info")
 }
 
-export const sendImage = async (chatId, senderId, imageUrl, replyTo) => {
-  await sendMessage(chatId, senderId, 'Image', imageUrl, replyTo, null)
+export const sendImage = async (chatId, senderData, imageUrl, replyTo, chatUsers) => {
+  await sendMessage(chatId, senderData.userId, 'Image', imageUrl, replyTo, null)
+
+  const otherUsers = chatUsers.filter(uid => uid !== senderData.userId)
+  await sendPushNotificationForUsers(otherUsers, `${senderData.firstName} ${senderData.lastName}`, `${senderData.firstName} sent an image`, chatId)
 }
 
 const sendMessage = async (chatId, senderId, messageText, imageUrl, replyTo, type) => {
@@ -161,7 +164,7 @@ export const addUsersToChat = async (userLoggedInData, usersToAddData, chatData)
   await sendInfoMessage(chatData.key, userLoggedInData.userId, messageText)
 }
 
-const sendPushNotificationForUsers = (chatUsers, title, body) => {
+const sendPushNotificationForUsers = (chatUsers, title, body, chatId) => {
   chatUsers.forEach(async uid => {
     const tokens = await getUserPushTokens(uid)
 
@@ -176,7 +179,8 @@ const sendPushNotificationForUsers = (chatUsers, title, body) => {
         body: JSON.stringify({
           to: token,
           title,
-          body
+          body,
+          data: { chatId }
         })
       })
     }

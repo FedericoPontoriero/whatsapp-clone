@@ -141,7 +141,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             const uploadUrl = await uploadImageAsync(tempImageUri, true)
             setIsLoading(false)
             //Send image
-            await sendImage(id, userData.userId, uploadUrl, replyingTo && replyingTo.key)
+            await sendImage(id, userData, uploadUrl, replyingTo && replyingTo.key, chatUsers)
 
             setReplyingTo(null)
             setTimeout(() => setTempImageUri(""), 500)

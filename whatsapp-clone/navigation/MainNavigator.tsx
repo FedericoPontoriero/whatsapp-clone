@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { NavigationContainerProps } from "@react-navigation/native";
+import { NavigationContainerProps, StackActions, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -116,6 +116,7 @@ const StackNavigator = () => {
 
 const MainNavigator = (props: MainNavigatorProps) => {
   const dispatch = useDispatch()
+  const navigation = useNavigation()
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -136,7 +137,14 @@ const MainNavigator = (props: MainNavigatorProps) => {
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
+      const { data } = response.notification.request.content
+      const chatId = data["chatId"]
+      if (chatId) {
+        const pushAction = StackActions.push("ChatScreen", { chatId })
+        navigation.dispatch(pushAction)
+      } else {
+        console.log("No chat id sent with notification");
+      }
     });
 
     return () => {
