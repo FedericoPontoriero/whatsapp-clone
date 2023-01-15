@@ -1,3 +1,5 @@
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
 import { getFirebaseApp } from "../firebaseHelper"
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { child, getDatabase, ref, set, update } from 'firebase/database'
@@ -25,6 +27,7 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
 
             dispatch(authenticate({ token: accessToken, userData }))
             saveDataToStorage(accessToken.token, uid, expiryDate)
+            await storePushToken(userData)
 
             timer = setTimeout(() => {
                 dispatch(userLogout())
@@ -67,6 +70,7 @@ export const signIn = (email: string, password: string) => {
 
             dispatch(authenticate({ token: accessToken, userData }))
             saveDataToStorage(accessToken.token, uid, expiryDate)
+            await storePushToken(userData)
 
             timer = setTimeout(() => {
                 dispatch(userLogout())
@@ -117,4 +121,30 @@ export const updateSignedInUserData = async (userId: string, newData: any) => {
     const dbRef = ref(getDatabase())
     const childRef = child(dbRef, `users/${userId}`)
     await update(childRef, newData)
+}
+
+const storePushToken = async (userData) => {
+    if (!Device.isDevice) {
+        return;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+
+    const tokenData = userData.pushTokens || {};
+    const tokenArray = Object.values(tokenData)
+
+    if (tokenArray.includes(token)) return;
+
+    tokenArray.push(token)
+
+    for (let i = 0; i < tokenArray.length; ++i) {
+        const tok = tokenArray[i]
+        tokenData[i] = tok
+    }
+
+    const app = getFirebaseApp()
+    const dbRef = ref(getDatabase(app))
+    const userRef = child(dbRef, `users/${userData.userId}/pushTokens`)
+
+    await set(userRef, tokenData)
 }
