@@ -2,7 +2,7 @@ import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { getFirebaseApp } from "../firebaseHelper"
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import { child, getDatabase, ref, set, update } from 'firebase/database'
+import { child, get, getDatabase, ref, set, update } from 'firebase/database'
 import { authenticate, logout } from "../../store/authSlice"
 import { AnyAction, Dispatch } from "@reduxjs/toolkit"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -30,7 +30,7 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
             await storePushToken(userData)
 
             timer = setTimeout(() => {
-                dispatch(userLogout())
+                dispatch(userLogout(userData))
             }, timeUntilExpiry)
 
         } catch (err: any) {
@@ -45,8 +45,10 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
     }
 }
 
-export const userLogout = (): any => {
+export const userLogout = (userData): any => {
     return async (dispatch: Dispatch<AnyAction>) => {
+        await removePushToken(userData)
+
         AsyncStorage.clear()
         clearTimeout(timer);
         dispatch(logout(true))
@@ -73,7 +75,7 @@ export const signIn = (email: string, password: string) => {
             await storePushToken(userData)
 
             timer = setTimeout(() => {
-                dispatch(userLogout())
+                dispatch(userLogout(userData))
             }, timeUntilExpiry)
 
         } catch (err: any) {
@@ -130,7 +132,7 @@ const storePushToken = async (userData) => {
 
     const token = (await Notifications.getExpoPushTokenAsync()).data;
 
-    const tokenData = userData.pushTokens || {};
+    const tokenData = { ...userData.pushTokens } || {};
     const tokenArray = Object.values(tokenData)
 
     if (tokenArray.includes(token)) return;
@@ -147,4 +149,42 @@ const storePushToken = async (userData) => {
     const userRef = child(dbRef, `users/${userData.userId}/pushTokens`)
 
     await set(userRef, tokenData)
+}
+
+const removePushToken = async (userData) => {
+    if (!Device.isDevice) {
+        return;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+
+    const tokenData = await getUserPushTokens(userData.userId)
+
+    for (const key in tokenData) {
+        if (tokenData[key] === token) {
+            delete tokenData[key]
+            break;
+        }
+    }
+
+    const app = getFirebaseApp()
+    const dbRef = ref(getDatabase(app))
+    const userRef = child(dbRef, `users/${userData.userId}/pushTokens`)
+
+    await set(userRef, tokenData)
+}
+
+export const getUserPushTokens = async (userId) => {
+    try {
+        const app = getFirebaseApp()
+        const dbRef = ref(getDatabase(app))
+        const userRef = child(dbRef, `users/${userId}/pushTokens`)
+
+        const snapshot = await get(userRef)
+        if (!snapshot || !snapshot.exists()) return {};
+
+        return snapshot.val() || {};
+    } catch (err) {
+        console.log(err);
+    }
 }
