@@ -47,8 +47,11 @@ export const signUp = (firstName: string, lastName: string, email: string, passw
 
 export const userLogout = (userData): any => {
     return async (dispatch: Dispatch<AnyAction>) => {
-        await removePushToken(userData)
-
+        try {
+            await removePushToken(userData)
+        } catch (err) {
+            console.log(err);
+        }
         AsyncStorage.clear()
         clearTimeout(timer);
         dispatch(logout(true))

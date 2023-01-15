@@ -99,7 +99,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                 id = await createChat(userData.userId, props.route.params.newChatData)
                 setChatId(id)
             }
-            await sendTextMessage(id, userData.userId, messageText, replyingTo && replyingTo.key)
+            await sendTextMessage(id, userData, messageText, replyingTo && replyingTo.key, chatUsers)
             setMessageText("")
             setReplyingTo(null)
         } catch (err) {
